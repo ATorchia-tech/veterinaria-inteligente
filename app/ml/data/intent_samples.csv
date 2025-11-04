@@ -1,0 +1,28 @@
+text,label
+"Quiero agendar un turno para mañana",turnos
+"Necesito reservar una cita para mi perro",turnos
+"Puedo reprogramar el turno de la tarde?",turnos
+"Necesito el refuerzo de la vacuna antirrábica",vacunacion
+"Cuándo toca la próxima vacuna triple?",vacunacion
+"Mi gato necesita vacunación contra la rabia",vacunacion
+"Es una emergencia, está sangrando",emergencia
+"Mi perro no respira, es urgente",emergencia
+"Tuvo una convulsión hace unos minutos",emergencia
+"Cuál es el precio de la castración?",precios
+"Cuánto sale la consulta general?",precios
+"Necesito presupuesto para cirugía",precios
+"Qué horarios tienen los domingos?",horarios
+"A qué hora abren los sábados?",horarios
+"Cierran durante los feriados?",horarios
+"Hacen castración y peluquería canina?",servicios
+"Ofrecen radiografías y análisis?",servicios
+"Quiero un baño y desparasitación",servicios
+"Cuál es la dirección de la veterinaria?",ubicacion
+"Cómo llego, tienen estacionamiento?",ubicacion
+"Dónde están ubicados exactamente?",ubicacion
+"Me pasan el teléfono o WhatsApp?",contacto
+"Cuál es el correo de contacto?",contacto
+"Puedo comunicarme por mail o WhatsApp?",contacto
+"Buenas, quería consultar",otros
+"Tengo una duda",otros
+"Necesito más información",otros

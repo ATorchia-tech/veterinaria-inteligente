@@ -1,0 +1,173 @@
+{
+  "labels": [
+    "contacto",
+    "emergencia",
+    "horarios",
+    "otros",
+    "precios",
+    "servicios",
+    "turnos",
+    "ubicacion",
+    "vacunacion"
+  ],
+  "cv_used": true,
+  "cv_n_splits": 3,
+  "accuracy_cv": 0.3333333333333333,
+  "precision_macro_cv": 0.37407407407407406,
+  "recall_macro_cv": 0.3333333333333333,
+  "f1_macro_cv": 0.3462962962962963,
+  "precision_micro_cv": 0.3333333333333333,
+  "recall_micro_cv": 0.3333333333333333,
+  "f1_micro_cv": 0.3333333333333333,
+  "precision_weighted_cv": 0.37407407407407406,
+  "recall_weighted_cv": 0.3333333333333333,
+  "f1_weighted_cv": 0.3462962962962963,
+  "per_class_cv": {
+    "contacto": {
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "f1": 0.8
+    },
+    "emergencia": {
+      "precision": 0.6666666666666666,
+      "recall": 0.6666666666666666,
+      "f1": 0.6666666666666666
+    },
+    "horarios": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "otros": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "precios": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "servicios": {
+      "precision": 0.2,
+      "recall": 0.3333333333333333,
+      "f1": 0.25
+    },
+    "turnos": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "ubicacion": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "vacunacion": {
+      "precision": 0.5,
+      "recall": 0.3333333333333333,
+      "f1": 0.4
+    }
+  },
+  "confusion_matrix_cv": [
+    [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      1
+    ]
+  ]
+}

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+
+# Venv
+.venv/
+
+# VCS & IDE
+.git/
+.gitignore
+.vscode/
+
+# Data/DB
+*.db
+app.db
+
+# Notebooks & data
+notebooks/
+data/

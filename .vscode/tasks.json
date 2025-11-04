@@ -1,0 +1,131 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run API",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "uvicorn", "app.main:app", "--reload"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Tests",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "pytest", "-q"],
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Format (black)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "black", "app", "tests"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint (ruff)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "ruff", "check", "."],
+      "problemMatcher": []
+    }
+    ,
+    {
+      "label": "Seed DB",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "app.db.seed"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "DB Revision (autogenerate)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/alembic.exe",
+      "args": ["revision", "--autogenerate", "-m", "auto"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "DB Upgrade (head)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/alembic.exe",
+      "args": ["upgrade", "head"],
+      "problemMatcher": [],
+      "group": "build"
+    }
+    ,
+    {
+      "label": "Train No-Show Model",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "app.ml.noshow"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Train Sentiment Model",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "app.ml.sentiment"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Train Intent Model",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "app.ml.intent"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Show Intent Metrics",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "app.ml.show_metrics"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Render Confusion Matrix (HTML)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["-m", "app.ml.render_confusion_matrix"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Open Confusion Matrix (HTML)",
+      "type": "shell",
+      "dependsOn": ["Render Confusion Matrix (HTML)"],
+      "command": "Invoke-Item",
+      "args": ["${workspaceFolder}\\app\\ml\\models\\intent_confusion_matrix.html"],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Publish to GitHub (repo + push)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}\\scripts\\publish_to_github.ps1",
+        "-GithubUser", "ATorchia-tech",
+        "-RepoName", "VETERINARIA-INTELIGENTE",
+        "-Visibility", "public"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    }
+  ]
+}

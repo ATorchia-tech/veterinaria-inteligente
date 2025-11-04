@@ -1,0 +1,10 @@
+,contacto,emergencia,horarios,otros,precios,servicios,turnos,ubicacion,vacunacion
+contacto,2,0,0,0,0,0,1,0,0
+emergencia,0,2,0,1,0,0,0,0,0
+horarios,0,0,3,0,0,0,0,0,0
+otros,0,1,0,0,1,1,0,0,0
+precios,0,0,0,0,0,0,2,1,0
+servicios,0,0,0,0,0,1,1,1,0
+turnos,0,0,0,0,1,1,0,0,1
+ubicacion,0,0,0,0,0,2,1,0,0
+vacunacion,0,0,0,0,0,0,2,0,1
