@@ -1,6 +1,6 @@
 from datetime import date, timedelta
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Query, Form
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -28,6 +28,31 @@ def create_vaccination(payload: VaccinationCreate, db: Session = Depends(get_db)
     return v
 
 
+@router.post("/form", response_model=VaccinationRead)
+def create_vaccination_form(
+    pet_id: int = Form(...),
+    vaccine_name: str = Form(...),
+    due_date: date = Form(...),
+    last_date: date | None = Form(None),
+    status: str | None = Form(None),
+    db: Session = Depends(get_db),
+):
+    pet = db.get(models.Pet, pet_id)
+    if not pet:
+        raise HTTPException(status_code=404, detail="Pet not found")
+    v = models.Vaccination(
+        pet_id=pet_id,
+        vaccine_name=vaccine_name,
+        due_date=due_date,
+        last_date=last_date,
+        status=status or "due",
+    )
+    db.add(v)
+    db.commit()
+    db.refresh(v)
+    return v
+
+
 @router.get("/upcoming", response_model=List[VaccinationRead])
 def upcoming(
     days: int = Query(30, ge=1, le=365),
@@ -39,7 +64,9 @@ def upcoming(
     limit = today + timedelta(days=days)
     q = (
         db.query(models.Vaccination)
-        .filter(models.Vaccination.due_date >= today, models.Vaccination.due_date <= limit)
+        .filter(
+            models.Vaccination.due_date >= today, models.Vaccination.due_date <= limit
+        )
         .order_by(models.Vaccination.due_date.asc())
     )
     return q.offset((page - 1) * page_size).limit(page_size).all()

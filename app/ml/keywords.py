@@ -15,28 +15,73 @@ def _normalize(text: str) -> str:
 # Categories and indicative Spanish keywords (simple baseline)
 KEYWORDS: Dict[str, List[str]] = {
     "turnos": [
-        "turno", "cita", "agendar", "reservar", "disponibilidad", "horario", "cancelar", "reprogramar",
+        "turno",
+        "cita",
+        "agendar",
+        "reservar",
+        "disponibilidad",
+        "horario",
+        "cancelar",
+        "reprogramar",
     ],
     "vacunacion": [
-        "vacuna", "vacunacion", "refuerzo", "antirrabica", "rabia", "triple", "quintuple",
+        "vacuna",
+        "vacunacion",
+        "refuerzo",
+        "antirrabica",
+        "rabia",
+        "triple",
+        "quintuple",
     ],
     "emergencia": [
-        "emergencia", "urgente", "sangrando", "convulsion", "accidente", "envenenado", "no respira",
+        "emergencia",
+        "urgente",
+        "sangrando",
+        "convulsion",
+        "accidente",
+        "envenenado",
+        "no respira",
     ],
     "precios": [
-        "precio", "costo", "cuanto sale", "cuanto cuesta", "arancel", "tarifa", "presupuesto",
+        "precio",
+        "costo",
+        "cuanto sale",
+        "cuanto cuesta",
+        "arancel",
+        "tarifa",
+        "presupuesto",
     ],
     "horarios": [
-        "horario", "abren", "cierran", "atencion", "domingos", "feriados",
+        "horario",
+        "abren",
+        "cierran",
+        "atencion",
+        "domingos",
+        "feriados",
     ],
     "ubicacion": [
-        "direccion", "ubicacion", "como llegar", "mapa", "estacionamiento",
+        "direccion",
+        "ubicacion",
+        "como llegar",
+        "mapa",
+        "estacionamiento",
     ],
     "contacto": [
-        "telefono", "whatsapp", "mail", "correo", "contacto",
+        "telefono",
+        "whatsapp",
+        "mail",
+        "correo",
+        "contacto",
     ],
     "servicios": [
-        "banio", "bano", "peluqueria", "castracion", "cirugia", "radiografia", "analisis", "desparasitacion",
+        "banio",
+        "bano",
+        "peluqueria",
+        "castracion",
+        "cirugia",
+        "radiografia",
+        "analisis",
+        "desparasitacion",
     ],
 }
 
@@ -62,7 +107,14 @@ def classify_text(text: str) -> Tuple[str, List[str], float]:
 
     # Choose the category with most matches; tie-break by a fixed priority order
     priority = [
-        "emergencia", "turnos", "vacunacion", "precios", "horarios", "servicios", "ubicacion", "contacto",
+        "emergencia",
+        "turnos",
+        "vacunacion",
+        "precios",
+        "horarios",
+        "servicios",
+        "ubicacion",
+        "contacto",
     ]
 
     best_label = "otros"

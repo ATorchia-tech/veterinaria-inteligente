@@ -13,13 +13,21 @@ SENTIMENT_PATH = MODELS_DIR / "sentiment.joblib"
 
 def _default_training_data():
     positives = [
-        "excelente servicio", "muy buena atención", "todo perfecto",
-        "recomiendo esta veterinaria", "trato amable y profesional",
-        "rápidos y eficientes", "mi mascota quedó feliz",
+        "excelente servicio",
+        "muy buena atención",
+        "todo perfecto",
+        "recomiendo esta veterinaria",
+        "trato amable y profesional",
+        "rápidos y eficientes",
+        "mi mascota quedó feliz",
     ]
     negatives = [
-        "muy mala experiencia", "pésimo servicio", "no lo recomiendo",
-        "lentos y desorganizados", "trato desagradable", "caro y deficiente",
+        "muy mala experiencia",
+        "pésimo servicio",
+        "no lo recomiendo",
+        "lentos y desorganizados",
+        "trato desagradable",
+        "caro y deficiente",
         "mi mascota salió peor",
     ]
     X = positives + negatives
@@ -30,10 +38,17 @@ def _default_training_data():
 def train_sentiment_model() -> None:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     X, y = _default_training_data()
-    pipe: Pipeline = Pipeline([
-        ("vec", CountVectorizer(ngram_range=(1, 2), lowercase=True)),
-        ("clf", LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42)),
-    ])
+    pipe: Pipeline = Pipeline(
+        [
+            ("vec", CountVectorizer(ngram_range=(1, 2), lowercase=True)),
+            (
+                "clf",
+                LogisticRegression(
+                    max_iter=1000, class_weight="balanced", random_state=42
+                ),
+            ),
+        ]
+    )
     pipe.fit(X, y)
     joblib.dump(pipe, SENTIMENT_PATH)
 

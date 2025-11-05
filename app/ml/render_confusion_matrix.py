@@ -50,7 +50,9 @@ def main() -> None:
         for val in row:
             frac = (val / max_val) if max_val else 0.0
             color = _color_scale(frac)
-            cells.append(f"<td style=\"background:{color}; text-align:center;\">{val}</td>")
+            cells.append(
+                f'<td style="background:{color}; text-align:center;">{val}</td>'
+            )
         rows_html.append(f"<tr><th>{labels[i]}</th>{''.join(cells)}</tr>")
 
     html = f"""

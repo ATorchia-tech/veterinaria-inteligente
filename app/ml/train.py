@@ -6,6 +6,7 @@ from app.ml.model import save_model
 
 # Entrenamiento con datos sintéticos para desbloquear el endpoint de IA
 
+
 def synth_data(n_days: int = 365):
     X, y = [], []
     start = date.today() - timedelta(days=n_days)
@@ -21,7 +22,11 @@ def synth_data(n_days: int = 365):
         }
         X.append(vectorize(feats))
         # Regla simple: fines de semana y buen clima => Alta, lluvia => Baja
-        if feats["is_weekend"] and feats["temp_avg"] > 18 and feats["precip_prob"] < 0.2:
+        if (
+            feats["is_weekend"]
+            and feats["temp_avg"] > 18
+            and feats["precip_prob"] < 0.2
+        ):
             y.append(2)  # Alta
         elif feats["precip_prob"] > 0.25:
             y.append(0)  # Baja

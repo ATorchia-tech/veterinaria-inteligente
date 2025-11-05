@@ -1,6 +1,6 @@
 from typing import List
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -20,6 +20,28 @@ def create_appointment(payload: AppointmentCreate, db: Session = Depends(get_db)
         reason=payload.reason,
         status="scheduled",
         pet_id=payload.pet_id,
+    )
+    db.add(ap)
+    db.commit()
+    db.refresh(ap)
+    return ap
+
+
+@router.post("/form", response_model=AppointmentRead)
+def create_appointment_form(
+    date: datetime = Form(...),
+    reason: str = Form(...),
+    pet_id: int = Form(...),
+    db: Session = Depends(get_db),
+):
+    pet = db.get(models.Pet, pet_id)
+    if not pet:
+        raise HTTPException(status_code=404, detail="Pet not found")
+    ap = models.Appointment(
+        date=date,
+        reason=reason,
+        status="scheduled",
+        pet_id=pet_id,
     )
     db.add(ap)
     db.commit()

@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Form
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -12,6 +12,20 @@ router = APIRouter()
 @router.post("/", response_model=OwnerRead)
 def create_owner(payload: OwnerCreate, db: Session = Depends(get_db)):
     owner = models.Owner(name=payload.name, phone=payload.phone, email=payload.email)
+    db.add(owner)
+    db.commit()
+    db.refresh(owner)
+    return owner
+
+
+@router.post("/form", response_model=OwnerRead)
+def create_owner_form(
+    name: str = Form(...),
+    phone: str | None = Form(None),
+    email: str | None = Form(None),
+    db: Session = Depends(get_db),
+):
+    owner = models.Owner(name=name, phone=phone, email=email)
     db.add(owner)
     db.commit()
     db.refresh(owner)

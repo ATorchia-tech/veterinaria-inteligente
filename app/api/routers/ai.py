@@ -48,7 +48,11 @@ def intent(body: IntentRequest):
         label, prob = predict_intent(body.text)
         # top-3 para transparencia
         top = predict_intent_topk(body.text, k=3)
-        return IntentResponse(label=label, probability=prob, top3=[{"label": lbl, "probability": prob_} for lbl, prob_ in top])
+        return IntentResponse(
+            label=label,
+            probability=prob,
+            top3=[{"label": lbl, "probability": prob_} for lbl, prob_ in top],
+        )
     except FileNotFoundError:
         label, _kws, conf = classify_text(body.text)
         # map confidence ~ probability

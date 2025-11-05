@@ -1,5 +1,6 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Form
+from datetime import date
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -21,6 +22,33 @@ def create_pet(payload: PetCreate, db: Session = Depends(get_db)):
         birth_date=payload.birth_date,
         notes=payload.notes,
         owner_id=payload.owner_id,
+    )
+    db.add(pet)
+    db.commit()
+    db.refresh(pet)
+    return pet
+
+
+@router.post("/form", response_model=PetRead)
+def create_pet_form(
+    name: str = Form(...),
+    species: str = Form(...),
+    breed: str | None = Form(None),
+    birth_date: date | None = Form(None),
+    notes: str | None = Form(None),
+    owner_id: int = Form(...),
+    db: Session = Depends(get_db),
+):
+    owner = db.get(models.Owner, owner_id)
+    if not owner:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    pet = models.Pet(
+        name=name,
+        species=species,
+        breed=breed,
+        birth_date=birth_date,
+        notes=notes,
+        owner_id=owner_id,
     )
     db.add(pet)
     db.commit()

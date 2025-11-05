@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 
 
 def get_weather_features(day: date | None = None) -> dict:

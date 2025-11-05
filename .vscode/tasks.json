@@ -33,6 +33,47 @@
     }
     ,
     {
+      "label": "Reset DB + Smoke E2E",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}\\scripts\\reset_db_and_smoke.ps1",
+        "-BaseUrl", "http://127.0.0.1:8000",
+        "-KillApi"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    }
+    ,
+    {
+      "label": "Run API + Open Docs (one-shot)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}\\scripts\\run_and_open.ps1",
+        "-ApiHost", "127.0.0.1",
+        "-ApiPort", "8000"
+      ],
+      "problemMatcher": [],
+      "group": "build"
+    }
+    ,
+    {
+      "label": "Smoke E2E",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}\\scripts\\smoke_e2e.ps1",
+        "-BaseUrl", "http://127.0.0.1:8000"
+      ],
+      "problemMatcher": [],
+      "group": "test"
+    }
+    ,
+    {
       "label": "Seed DB",
       "type": "shell",
       "command": "${workspaceFolder}/.venv/Scripts/python.exe",
@@ -123,6 +164,20 @@
         "-GithubUser", "ATorchia-tech",
         "-RepoName", "VETERINARIA-INTELIGENTE",
         "-Visibility", "public"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    }
+    ,
+    {
+      "label": "Export Report to PDF",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}\\scripts\\export_report_pdf.ps1",
+        "-InputMd", "${workspaceFolder}\\docs\\Informe_Veterinaria_Inteligente.md",
+        "-OutputPdf", "${workspaceFolder}\\docs\\Informe_Veterinaria_Inteligente.pdf"
       ],
       "problemMatcher": [],
       "group": "none"
