@@ -1,9 +1,19 @@
 [nix]
 channel = "stable-23_11"
 
+module = "app.main:app"
+run = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+[nix]
+channel = "stable-24_05"
+
 [deployment]
-run = ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+run = ["sh", "-c", "pip install -r requirements.txt && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
 deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
 
 [[ports]]
 localPort = 8000

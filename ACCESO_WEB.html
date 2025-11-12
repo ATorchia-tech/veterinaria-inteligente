@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Acceso Web para Compañeros - Veterinaria Inteligente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .alert {
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 10px;
+            border-left: 5px solid;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .option-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            border-top: 5px solid;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .option-1 { border-color: #28a745; }
+        .option-2 { border-color: #007bff; }
+        .option-3 { border-color: #ffc107; }
+        
+        .option-card h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .badge-recommended {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-easy {
+            background: #007bff;
+            color: white;
+        }
+        
+        .badge-fast {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .pros {
+            background: #d4edda;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .pros h4 {
+            color: #155724;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pros ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .pros li:before {
+            content: "✅ ";
+            margin-right: 0.5rem;
+        }
+        
+        .steps {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .steps h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .step {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 1rem 0.5rem 0 0;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .email-template {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .comparison {
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 3 Formas GRATIS de Compartir tu Proyecto</h1>
+            <p>Veterinaria Inteligente - Acceso para Compañeros y Docente</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert alert-success">
+                <h3>✅ Render falló, pero tenemos 3 alternativas MEJORES y GRATIS</h3>
+                <p>Todas estas opciones permiten que tus compañeros y docente accedan desde su navegador <strong>sin instalar nada</strong>.</p>
+            </div>
+            
+            <!-- OPCIONES -->
+            <div class="options">
+                <!-- OPCIÓN 1: CODESPACES -->
+                <div class="option-card option-1">
+                    <span class="badge badge-recommended">⭐ MÁS RECOMENDADA</span>
+                    <h2>1️⃣ GitHub Codespaces</h2>
+                    
+                    <div class="pros">
+                        <h4>✨ Ventajas:</h4>
+                        <ul>
+                            <li>Ya tienes el código en GitHub</li>
+                            <li>60 horas GRATIS por mes</li>
+                            <li>VS Code completo en el navegador</li>
+                            <li>Configuración automática (2 minutos)</li>
+                            <li>Cada persona puede crear su propio Codespace</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="steps">
+                        <h4>📋 Pasos para tus compañeros/docente:</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            Ir a: <a href="https://github.com/ATorchia-tech/veterinaria-inteligente" target="_blank">
+                                https://github.com/ATorchia-tech/veterinaria-inteligente
+                            </a>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            Click en el botón verde <strong>"Code"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            Seleccionar pestaña <strong>"Codespaces"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            Click en <strong>"Create codespace on main"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            Esperar 2-3 minutos mientras se configura todo automáticamente
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            Cuando aparezca el mensaje del puerto 8000, click en <strong>"Open in Browser"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">7</span>
+                            ¡Listo! Ya pueden usar la aplicación
+                        </div>
+                    </div>
+                    
+                    <a href="https://github.com/ATorchia-tech/veterinaria-inteligente" target="_blank" class="btn">
+                        🚀 Abrir Repositorio
+                    </a>
+                </div>
+                
+                <!-- OPCIÓN 2: REPLIT -->
+                <div class="option-card option-2">
+                    <span class="badge badge-easy">🎯 MÁS FÁCIL</span>
+                    <h2>2️⃣ Replit</h2>
+                    
+                    <div class="pros">
+                        <h4>✨ Ventajas:</h4>
+                        <ul>
+                            <li>100% Gratis</li>
+                            <li>Importa directo desde GitHub</li>
+                            <li>URL pública permanente</li>
+                            <li>Editor colaborativo en tiempo real</li>
+                            <li>Un solo Repl para todos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="steps">
+                        <h4>📋 Pasos (solo tú haces esto una vez):</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            Ir a: <a href="https://replit.com" target="_blank">https://replit.com</a>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            Crear cuenta gratis (con email o GitHub)
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            Click en <strong>"Create Repl"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            Seleccionar <strong>"Import from GitHub"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            Pegar: <code>https://github.com/ATorchia-tech/veterinaria-inteligente</code>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            Click en <strong>"Import from GitHub"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">7</span>
+                            Replit detectará que es Python y configurará todo
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">8</span>
+                            Click en <strong>"Run"</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">9</span>
+                            Copiar la URL que aparece arriba (será algo como <code>https://tu-repl.usuario.repl.co</code>)
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">10</span>
+                            Compartir esa URL con tus compañeros y docente
+                        </div>
+                    </div>
+                    
+                    <a href="https://replit.com/new/github/ATorchia-tech/veterinaria-inteligente" target="_blank" class="btn">
+                        🚀 Importar a Replit
+                    </a>
+                </div>
+                
+                <!-- OPCIÓN 3: GITPOD -->
+                <div class="option-card option-3">
+                    <span class="badge badge-fast">⚡ MÁS RÁPIDA</span>
+                    <h2>3️⃣ Gitpod</h2>
+                    
+                    <div class="pros">
+                        <h4>✨ Ventajas:</h4>
+                        <ul>
+                            <li>50 horas GRATIS por mes</li>
+                            <li>Inicia en 30 segundos</li>
+                            <li>Integración perfecta con GitHub</li>
+                            <li>Comparte workspace en tiempo real</li>
+                            <li>Muy rápido y potente</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="steps">
+                        <h4>📋 Pasos súper rápidos:</h4>
+                        
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            Solo agregar <code>gitpod.io/#</code> antes de tu URL de GitHub
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            URL completa: <br>
+                            <code>https://gitpod.io/#https://github.com/ATorchia-tech/veterinaria-inteligente</code>
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            Abrir esa URL en el navegador
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            Iniciar sesión con GitHub
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            Esperar 30 segundos
+                        </div>
+                        
+                        <div class="step">
+                            <span class="step-number">6</span>
+                            ¡Listo! El servidor se inicia automáticamente
+                        </div>
+                    </div>
+                    
+                    <a href="https://gitpod.io/#https://github.com/ATorchia-tech/veterinaria-inteligente" target="_blank" class="btn">
+                        🚀 Abrir en Gitpod
+                    </a>
+                </div>
+            </div>
+            
+            <!-- TABLA COMPARATIVA -->
+            <div class="comparison">
+                <h2 style="margin: 2rem 0 1rem;">📊 Comparación Rápida</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Característica</th>
+                            <th>GitHub Codespaces</th>
+                            <th>Replit</th>
+                            <th>Gitpod</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Horas Gratis/Mes</strong></td>
+                            <td>60 horas</td>
+                            <td>Ilimitado</td>
+                            <td>50 horas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tiempo de Inicio</strong></td>
+                            <td>2-3 minutos</td>
+                            <td>1-2 minutos</td>
+                            <td>30 segundos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>URL Permanente</strong></td>
+                            <td>No (cambia cada vez)</td>
+                            <td>Sí</td>
+                            <td>No (cambia cada vez)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Configuración</strong></td>
+                            <td>Automática (ya está lista)</td>
+                            <td>Manual (pero fácil)</td>
+                            <td>Automática</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complejidad</strong></td>
+                            <td>⭐⭐ Media</td>
+                            <td>⭐ Muy Fácil</td>
+                            <td>⭐ Muy Fácil</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mejor Para</strong></td>
+                            <td>Evaluadores individuales</td>
+                            <td>Compartir con el equipo</td>
+                            <td>Demostraciones rápidas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- EMAIL TEMPLATE -->
+            <h2 style="margin: 3rem 0 1rem;">📧 Email para Enviar al Equipo</h2>
+            
+            <div class="email-template">Asunto: Proyecto Veterinaria Inteligente - Acceso Web FÁCIL
+
+Hola equipo y profesor/a,
+
+Les comparto el acceso a nuestro proyecto. Pueden probarlo 100% desde el navegador, SIN instalar nada:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 REPOSITORIO EN GITHUB:
+https://github.com/ATorchia-tech/veterinaria-inteligente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 OPCIÓN 1: GitHub Codespaces (RECOMENDADA)
+
+1. Ir al repositorio (enlace arriba)
+2. Click en botón verde "Code"
+3. Pestaña "Codespaces"
+4. Click "Create codespace on main"
+5. Esperar 2-3 minutos
+6. Cuando aparezca el mensaje del puerto 8000, click "Open in Browser"
+
+✅ Cada uno puede crear su propio Codespace
+✅ 60 horas gratis por mes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 OPCIÓN 2: Replit (MÁS FÁCIL)
+
+Usar este enlace directo:
+https://replit.com/new/github/ATorchia-tech/veterinaria-inteligente
+
+1. Crear cuenta gratis en Replit
+2. Click en "Import from GitHub"
+3. Click en "Run"
+4. Compartir la URL que aparece
+
+✅ URL permanente para todos
+✅ Totalmente gratis
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ OPCIÓN 3: Gitpod (MÁS RÁPIDA)
+
+Usar este enlace directo:
+https://gitpod.io/#https://github.com/ATorchia-tech/veterinaria-inteligente
+
+1. Click en el enlace
+2. Iniciar sesión con GitHub
+3. Esperar 30 segundos
+4. ¡Listo!
+
+✅ Inicia en 30 segundos
+✅ 50 horas gratis por mes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 URLs IMPORTANTES (una vez que esté corriendo):
+
+• Página Principal: /
+• Panel de Recepción: /ui
+• Panel Veterinario: /vet/
+• Dashboard IA: /ai-dashboard/
+• Presentación del Proyecto: /admin/presentation
+• Documentación API: /docs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👥 EQUIPO IFTS-12:
+• Adriana Mercado
+• Sofía Paniagua
+• Franco Hernández
+• Aroldo Torchia
+
+Sistema de Gestión Veterinaria con Inteligencia Artificial
+Año 2025
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cualquier duda, estoy disponible.
+¡Saludos!</div>
+            
+            <!-- RECOMENDACIÓN FINAL -->
+            <div class="alert alert-info" style="margin-top: 2rem;">
+                <h3>💡 Mi Recomendación Personal:</h3>
+                <p><strong>Para el docente:</strong> GitHub Codespaces (puede crear su propio ambiente sin afectar nada)</p>
+                <p><strong>Para tus compañeros:</strong> Replit (una sola URL para todos, más simple)</p>
+                <p><strong>Para demostraciones en clase:</strong> Gitpod (súper rápido, impresionante)</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
