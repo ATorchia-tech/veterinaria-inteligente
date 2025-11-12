@@ -1,0 +1,10 @@
+[nix]
+channel = "stable-23_11"
+
+[deployment]
+run = ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
