@@ -10,7 +10,9 @@ client = TestClient(app)
 
 
 def test_intent_top3_present_and_sorted():
-    res = client.post("/ai/intent", json={"text": "Quiero agendar un turno para mañana"})
+    res = client.post(
+        "/ai/intent", json={"text": "Quiero agendar un turno para mañana"}
+    )
     assert res.status_code == 200
     data = res.json()
     assert "top3" in data

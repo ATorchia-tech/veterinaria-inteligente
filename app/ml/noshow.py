@@ -13,7 +13,9 @@ MODELS_DIR = Path(__file__).resolve().parent / "models"
 MODEL_PATH = MODELS_DIR / "noshow.joblib"
 
 
-def _vectorize(day: date, hour: int, temp_avg: float, precip_prob: float, is_weekend: int) -> np.ndarray:
+def _vectorize(
+    day: date, hour: int, temp_avg: float, precip_prob: float, is_weekend: int
+) -> np.ndarray:
     return np.array([is_weekend, hour, temp_avg, precip_prob], dtype=float)
 
 

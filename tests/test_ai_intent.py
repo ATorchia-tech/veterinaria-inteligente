@@ -10,7 +10,9 @@ client = TestClient(app)
 
 
 def test_intent_turnos():
-    res = client.post("/ai/intent", json={"text": "Quiero agendar un turno para mañana"})
+    res = client.post(
+        "/ai/intent", json={"text": "Quiero agendar un turno para mañana"}
+    )
     assert res.status_code == 200
     data = res.json()
     assert data["label"] == "turnos"
@@ -18,7 +20,9 @@ def test_intent_turnos():
 
 
 def test_intent_vacunacion():
-    res = client.post("/ai/intent", json={"text": "Necesito el refuerzo de la vacuna antirrábica"})
+    res = client.post(
+        "/ai/intent", json={"text": "Necesito el refuerzo de la vacuna antirrábica"}
+    )
     assert res.status_code == 200
     data = res.json()
     assert data["label"] == "vacunacion"
@@ -32,7 +36,9 @@ def test_intent_emergencia():
 
 
 def test_intent_precios_o_servicios():
-    res = client.post("/ai/intent", json={"text": "Cuál es el precio de la castración?"})
+    res = client.post(
+        "/ai/intent", json={"text": "Cuál es el precio de la castración?"}
+    )
     assert res.status_code == 200
     data = res.json()
     # según dataset, debería clasificar como precios (incluye 'precio')

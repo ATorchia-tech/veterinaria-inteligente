@@ -10,13 +10,19 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedKFold, cross_val_predict, train_test_split
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    precision_recall_fscore_support,
+    confusion_matrix,
+)
 import json
 
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 MODEL_PATH = os.path.join(MODEL_DIR, "intent.joblib")
-DEFAULT_DATASET_PATH = os.path.join(os.path.dirname(__file__), "data", "intent_samples.csv")
+DEFAULT_DATASET_PATH = os.path.join(
+    os.path.dirname(__file__), "data", "intent_samples.csv"
+)
 METRICS_JSON_PATH = os.path.join(MODEL_DIR, "intent_metrics.json")
 CM_CSV_PATH = os.path.join(MODEL_DIR, "intent_confusion_matrix.csv")
 
@@ -31,12 +37,16 @@ def _strip_accents(text: str) -> str:
 
 def build_pipeline() -> Pipeline:
     # Preprocesa acentos usando preprocessor de TfidfVectorizer (función global picklable)
-    vect = TfidfVectorizer(ngram_range=(1, 2), min_df=1, preprocessor=_strip_accents, lowercase=False)
+    vect = TfidfVectorizer(
+        ngram_range=(1, 2), min_df=1, preprocessor=_strip_accents, lowercase=False
+    )
     clf = LogisticRegression(max_iter=1000, n_jobs=None)
-    pipe = Pipeline([
-        ("tfidf", vect),
-        ("clf", clf),
-    ])
+    pipe = Pipeline(
+        [
+            ("tfidf", vect),
+            ("clf", clf),
+        ]
+    )
     return pipe
 
 
@@ -52,23 +62,34 @@ def train_from_csv(csv_path: str = DEFAULT_DATASET_PATH) -> Pipeline:
     return pipe
 
 
-def _compute_cv_metrics(X: List[str], y: List[str], n_splits: int = 5, random_state: int = 42) -> Dict[str, Any]:
+def _compute_cv_metrics(
+    X: List[str], y: List[str], n_splits: int = 5, random_state: int = 42
+) -> Dict[str, Any]:
     labels = sorted(list(set(y)))
     # Ajustar n_splits según el mínimo de ejemplos por clase
     from collections import Counter
+
     counts = Counter(y)
     min_count = min(counts.values()) if counts else 0
     eff_splits = max(2, min(n_splits, min_count)) if min_count >= 2 else 0
 
     pipe = build_pipeline()
     if eff_splits >= 2:
-        skf = StratifiedKFold(n_splits=eff_splits, shuffle=True, random_state=random_state)
+        skf = StratifiedKFold(
+            n_splits=eff_splits, shuffle=True, random_state=random_state
+        )
         # Predicciones por validación cruzada (evita fuga de datos)
         y_pred = cross_val_predict(pipe, X, y, cv=skf)
         cv_used = True
     else:
         # Fallback: hold-out simple si no se puede estratificar
-        X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.33, random_state=random_state, stratify=y if len(labels) > 1 else None)
+        X_tr, X_te, y_tr, y_te = train_test_split(
+            X,
+            y,
+            test_size=0.33,
+            random_state=random_state,
+            stratify=y if len(labels) > 1 else None,
+        )
         pipe.fit(X_tr, y_tr)
         y_pred = pipe.predict(X_te)
         # Para unificar métricas, comparamos sobre test solamente
@@ -76,12 +97,20 @@ def _compute_cv_metrics(X: List[str], y: List[str], n_splits: int = 5, random_st
         cv_used = False
 
     acc = accuracy_score(y, y_pred)
-    prec_macro, rec_macro, f1_macro, _ = precision_recall_fscore_support(y, y_pred, average="macro", zero_division=0)
-    prec_micro, rec_micro, f1_micro, _ = precision_recall_fscore_support(y, y_pred, average="micro", zero_division=0)
-    prec_weighted, rec_weighted, f1_weighted, _ = precision_recall_fscore_support(y, y_pred, average="weighted", zero_division=0)
+    prec_macro, rec_macro, f1_macro, _ = precision_recall_fscore_support(
+        y, y_pred, average="macro", zero_division=0
+    )
+    prec_micro, rec_micro, f1_micro, _ = precision_recall_fscore_support(
+        y, y_pred, average="micro", zero_division=0
+    )
+    prec_weighted, rec_weighted, f1_weighted, _ = precision_recall_fscore_support(
+        y, y_pred, average="weighted", zero_division=0
+    )
 
     # métricas por clase
-    prec_cls, rec_cls, f1_cls, _ = precision_recall_fscore_support(y, y_pred, labels=labels, zero_division=0)
+    prec_cls, rec_cls, f1_cls, _ = precision_recall_fscore_support(
+        y, y_pred, labels=labels, zero_division=0
+    )
     per_class = {
         lbl: {
             "precision": float(prec_cls[i]),
@@ -113,7 +142,11 @@ def _compute_cv_metrics(X: List[str], y: List[str], n_splits: int = 5, random_st
     return result
 
 
-def _save_metrics_artifacts(metrics: Dict[str, Any], metrics_path: str = METRICS_JSON_PATH, cm_csv_path: str = CM_CSV_PATH) -> None:
+def _save_metrics_artifacts(
+    metrics: Dict[str, Any],
+    metrics_path: str = METRICS_JSON_PATH,
+    cm_csv_path: str = CM_CSV_PATH,
+) -> None:
     os.makedirs(os.path.dirname(metrics_path), exist_ok=True)
     # Guardar JSON con métricas
     with open(metrics_path, "w", encoding="utf-8") as f:
@@ -144,18 +177,22 @@ def predict_intent(text: str, path: str = MODEL_PATH) -> Tuple[str, float]:
     return str(label), float(proba[idx])
 
 
-def predict_intent_topk(text: str, k: int = 3, path: str = MODEL_PATH) -> List[Tuple[str, float]]:
+def predict_intent_topk(
+    text: str, k: int = 3, path: str = MODEL_PATH
+) -> List[Tuple[str, float]]:
     if not os.path.exists(path):
         raise FileNotFoundError(path)
     pipe = load_model(path)
     proba = pipe.predict_proba([text])[0]
     classes = list(pipe.classes_)
     # top-k indices sorted desc
-    idxs = sorted(range(len(proba)), key=lambda i: proba[i], reverse=True)[:max(1, k)]
+    idxs = sorted(range(len(proba)), key=lambda i: proba[i], reverse=True)[: max(1, k)]
     return [(str(classes[i]), float(proba[i])) for i in idxs]
 
 
-def train_and_save_default(csv_path: str = DEFAULT_DATASET_PATH, model_path: str = MODEL_PATH) -> str:
+def train_and_save_default(
+    csv_path: str = DEFAULT_DATASET_PATH, model_path: str = MODEL_PATH
+) -> str:
     pipe = train_from_csv(csv_path)
     save_model(pipe, model_path)
     # Calcular y guardar métricas de validación cruzada con el dataset completo

@@ -10,7 +10,9 @@ from .intent import METRICS_JSON_PATH
 def main() -> None:
     path = METRICS_JSON_PATH
     if not os.path.exists(path):
-        print(f"No se encontró el archivo de métricas: {path}\nEntrená primero el modelo con: python -m app.ml.intent")
+        print(
+            f"No se encontró el archivo de métricas: {path}\nEntrená primero el modelo con: python -m app.ml.intent"
+        )
         return
 
     with open(path, "r", encoding="utf-8") as f:
