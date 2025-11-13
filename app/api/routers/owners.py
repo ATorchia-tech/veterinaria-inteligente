@@ -663,7 +663,7 @@ def search_owners_view(
     email: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
-    """Vista HTML de búsqueda de dueños con filtros."""
+    """Vista HTML de búsqueda de dueños con filtros - Diseño profesional sin scroll."""
     # Construir query
     query = db.query(models.Owner)
     
@@ -681,17 +681,6 @@ def search_owners_view(
     
     owners = query.order_by(models.Owner.name.asc()).all()
     
-    # Construir descripción de filtros
-    filter_parts = []
-    if name:
-        filter_parts.append(f"Nombre: {name}")
-    if phone:
-        filter_parts.append(f"Teléfono: {phone}")
-    if email:
-        filter_parts.append(f"Email: {email}")
-    
-    filter_text = " | ".join(filter_parts) if filter_parts else "Sin filtros"
-    
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -701,256 +690,258 @@ def search_owners_view(
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>👤 Búsqueda de Dueños - Veterinaria Inteligente</title>
       <style>
-        * {{ box-sizing: border-box; }}
+        * {{ 
+          box-sizing: border-box; 
+          margin: 0;
+          padding: 0;
+        }}
         body {{
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          margin: 0;
-          padding: 2rem;
           background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-          min-height: 100vh;
+          height: 100vh;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
         }}
-        .container {{
-          max-width: 1400px;
-          margin: 0 auto;
-          background: #fff;
-          border-radius: 16px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-          padding: 2rem;
-        }}
-        header {{
-          text-align: center;
-          margin-bottom: 2rem;
-          padding-bottom: 1.5rem;
-          border-bottom: 3px solid #f0f0f0;
-        }}
-        header h1 {{
-          margin: 0 0 .5rem;
-          font-size: 2.5rem;
-          color: #333;
-          font-weight: 700;
-        }}
-        header p {{
-          margin: .5rem 0 0;
-          color: #666;
-          font-size: 1.1rem;
-        }}
-        .summary {{
+        
+        /* Encabezado fijo */
+        .header-fixed {{
           background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
           color: white;
-          padding: 2rem;
-          border-radius: 12px;
-          margin-bottom: 2rem;
+          padding: 1rem 2rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
           display: flex;
           justify-content: space-between;
           align-items: center;
-          flex-wrap: wrap;
-          gap: 1rem;
+          z-index: 1000;
         }}
-        .summary .count {{
-          font-size: 2.5rem;
+        .header-fixed h1 {{
+          font-size: 1.8rem;
           font-weight: 700;
         }}
-        .summary .info {{
-          flex: 1;
-          text-align: right;
-        }}
-        .toggle-filters {{
+        .btn-back {{
           background: rgba(255, 255, 255, 0.3);
           color: white;
           border: 2px solid white;
-          padding: 0.75rem 1.5rem;
+          padding: 0.6rem 1.2rem;
           border-radius: 8px;
-          cursor: pointer;
-          font-size: 1rem;
+          text-decoration: none;
           font-weight: 600;
+          font-size: 0.95rem;
           transition: all 0.3s;
+          white-space: nowrap;
         }}
-        .toggle-filters:hover {{
+        .btn-back:hover {{
           background: white;
           color: #11998e;
           transform: translateY(-2px);
         }}
-        #filters-detail {{
-          animation: slideDown 0.3s ease-out;
+        
+        /* Contenedor principal con scroll */
+        .main-container {{
+          flex: 1;
+          overflow-y: auto;
+          padding: 1.5rem;
         }}
-        @keyframes slideDown {{
-          from {{
-            opacity: 0;
-            transform: translateY(-10px);
-          }}
-          to {{
-            opacity: 1;
-            transform: translateY(0);
-          }}
+        
+        /* Resumen compacto */
+        .summary {{
+          background: white;
+          color: #333;
+          padding: 1.2rem 2rem;
+          border-radius: 12px;
+          margin: 0 auto 1.5rem;
+          max-width: 1600px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }}
+        .summary .count {{
+          font-size: 2.2rem;
+          font-weight: 700;
+          color: #11998e;
+        }}
+        .summary .label {{
+          font-size: 0.95rem;
+          color: #666;
+        }}
+        
+        /* Grid de dueños - optimizado para zoom 80% */
         .owners-grid {{
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 2rem;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 1rem;
+          max-width: 1600px;
+          margin: 0 auto;
+          padding-bottom: 1rem;
         }}
+        
+        /* Tarjetas de dueño - más compactas */
         .owner-card {{
-          background: #f8f9fa;
+          background: white;
           border-left: 5px solid #11998e;
-          border-radius: 8px;
-          padding: 1.5rem;
+          border-radius: 10px;
+          padding: 1rem;
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition: all 0.2s;
         }}
         .owner-card:hover {{
           transform: translateY(-4px);
           box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }}
+        
+        /* Header de tarjeta */
         .owner-header {{
           display: flex;
           align-items: center;
-          gap: 1rem;
-          margin-bottom: 1rem;
-          padding-bottom: 1rem;
-          border-bottom: 2px solid #e0e0e0;
+          gap: 0.8rem;
+          margin-bottom: 0.8rem;
+          padding-bottom: 0.8rem;
+          border-bottom: 2px solid #f0f0f0;
         }}
         .owner-icon {{
-          font-size: 3rem;
+          font-size: 2.5rem;
+          flex-shrink: 0;
+        }}
+        .owner-info {{
+          flex: 1;
+          min-width: 0;
         }}
         .owner-name {{
-          font-size: 1.8rem;
+          font-size: 1.3rem;
           font-weight: 700;
           color: #333;
-          margin: 0;
+          margin-bottom: 0.2rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }}
         .owner-id {{
           color: #11998e;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           font-weight: 600;
-          margin: 0.25rem 0 0;
         }}
+        
+        /* Información de contacto */
         .contact-info {{
           display: grid;
-          gap: 0.75rem;
-          margin-bottom: 1rem;
+          gap: 0.5rem;
+          margin-bottom: 0.8rem;
         }}
         .contact-row {{
           display: flex;
           gap: 0.5rem;
           align-items: center;
+          font-size: 0.9rem;
         }}
         .contact-icon {{
-          font-size: 1.2rem;
-          min-width: 30px;
+          font-size: 1.1rem;
+          min-width: 24px;
+          flex-shrink: 0;
         }}
         .contact-value {{
-          color: #333;
-          font-size: 1rem;
+          color: #555;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }}
+        
+        /* Sección de mascotas */
         .pets-section {{
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
-          padding: 1rem;
+          padding: 0.8rem;
           border-radius: 8px;
-          margin-top: 1rem;
+          margin-bottom: 0.8rem;
         }}
         .pets-section h4 {{
-          margin: 0 0 0.75rem;
-          font-size: 1.1rem;
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
         }}
         .pet-item {{
           background: rgba(255, 255, 255, 0.2);
-          padding: 0.5rem;
+          padding: 0.4rem 0.6rem;
           border-radius: 6px;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.4rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          font-size: 0.85rem;
         }}
         .pet-item:last-child {{
           margin-bottom: 0;
         }}
-        .actions {{
-          display: flex;
-          gap: 0.5rem;
-          margin-top: 1rem;
-        }}
-        .btn {{
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          text-decoration: none;
-          font-size: 0.9rem;
-          font-weight: 600;
-          transition: all 0.2s;
-          display: inline-block;
-          text-align: center;
-          flex: 1;
-        }}
-        .btn-primary {{
+        
+        /* Botón de acción */
+        .btn-view {{
+          display: block;
+          width: 100%;
+          padding: 0.7rem;
           background: #11998e;
           color: white;
+          text-decoration: none;
+          text-align: center;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          transition: all 0.2s;
         }}
-        .btn-primary:hover {{
+        .btn-view:hover {{
           background: #38ef7d;
+          transform: translateY(-2px);
         }}
+        
+        /* Estado sin resultados */
         .no-results {{
           text-align: center;
-          padding: 3rem;
+          padding: 3rem 2rem;
           color: #666;
-          font-size: 1.2rem;
+          background: white;
+          border-radius: 12px;
+          max-width: 600px;
+          margin: 0 auto;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }}
         .no-results-icon {{
           font-size: 4rem;
           margin-bottom: 1rem;
         }}
-        .back-link {{
-          display: inline-block;
-          margin-top: 2rem;
-          padding: 0.75rem 1.5rem;
-          background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-          color: white;
-          text-decoration: none;
-          border-radius: 8px;
-          font-weight: 600;
-          transition: transform 0.2s;
+        
+        /* Scrollbar personalizada */
+        .main-container::-webkit-scrollbar {{
+          width: 10px;
         }}
-        .back-link:hover {{
-          transform: translateY(-2px);
+        .main-container::-webkit-scrollbar-track {{
+          background: rgba(255,255,255,0.1);
+        }}
+        .main-container::-webkit-scrollbar-thumb {{
+          background: rgba(255,255,255,0.3);
+          border-radius: 5px;
+        }}
+        .main-container::-webkit-scrollbar-thumb:hover {{
+          background: rgba(255,255,255,0.5);
         }}
       </style>
     </head>
     <body>
-      <div class="container">
-        <header>
-          <h1>👤 Búsqueda de Dueños</h1>
-          <p>Resultados de la búsqueda</p>
-        </header>
-        
+      <!-- Encabezado fijo -->
+      <div class="header-fixed">
+        <h1>👤 Búsqueda de Dueños</h1>
+        <a href="/vet/clinica" class="btn-back">⬅️ VOLVER A ATENCIÓN CLÍNICA</a>
+      </div>
+      
+      <!-- Contenedor principal con scroll -->
+      <div class="main-container">
+        <!-- Resumen -->
         <div class="summary">
           <div>
             <div class="count">{len(owners)}</div>
-            <div>dueños encontrados</div>
-          </div>
-          <div class="info">
-            <button class="toggle-filters" onclick="toggleFilters()">
-              📋 Ver filtros aplicados
-            </button>
-            <div id="filters-detail" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.2); border-radius: 8px; text-align: left;">
-              <strong style="display: block; margin-bottom: 0.5rem;">Filtros aplicados:</strong>
-              <p style="margin: 0.25rem 0;">{filter_text}</p>
-            </div>
+            <div class="label">dueños encontrados</div>
           </div>
         </div>
         
-        <script>
-          function toggleFilters() {{
-            const detail = document.getElementById('filters-detail');
-            const btn = document.querySelector('.toggle-filters');
-            if (detail.style.display === 'none') {{
-              detail.style.display = 'block';
-              btn.textContent = '📋 Ocultar filtros';
-            }} else {{
-              detail.style.display = 'none';
-              btn.textContent = '📋 Ver filtros aplicados';
-            }}
-          }}
-        </script>
-        
+        <!-- Grid de dueños -->
         <div class="owners-grid">
     """
     
@@ -962,35 +953,40 @@ def search_owners_view(
             # Obtener mascotas del dueño
             pets = owner.pets if owner.pets else []
             
+            # Construir lista de mascotas
+            pets_html = ""
+            if pets:
+                for pet in pets[:3]:
+                    pets_html += f'<div class="pet-item"><span>{pet.name}</span><span>{pet.species}</span></div>'
+                if len(pets) > 3:
+                    pets_html += f'<p style="margin: 0.5rem 0 0; font-size: 0.8rem; opacity: 0.8;">... y {len(pets) - 3} más</p>'
+            else:
+                pets_html = '<p style="margin: 0; opacity: 0.8; font-size: 0.85rem;">Sin mascotas registradas</p>'
+            
             html_content += f"""
           <div class="owner-card">
             <div class="owner-header">
               <div class="owner-icon">👤</div>
-              <div>
-                <h2 class="owner-name">{owner.name}</h2>
-                <p class="owner-id">ID: #{owner.id}</p>
+              <div class="owner-info">
+                <div class="owner-name" title="{owner.name}">{owner.name}</div>
+                <div class="owner-id">ID: #{owner.id}</div>
               </div>
             </div>
             
             <div class="contact-info">
               <div class="contact-row">
                 <span class="contact-icon">📞</span>
-                <span class="contact-value">{phone_display}</span>
+                <span class="contact-value" title="{phone_display}">{phone_display}</span>
               </div>
               <div class="contact-row">
                 <span class="contact-icon">📧</span>
-                <span class="contact-value">{email_display}</span>
+                <span class="contact-value" title="{email_display}">{email_display}</span>
               </div>
             </div>
             
             <div class="pets-section">
               <h4>🐾 Mascotas ({len(pets)})</h4>
-              {f'''{''.join([f'<div class="pet-item"><span>{pet.name}</span><span>{pet.species}</span></div>' for pet in pets[:5]])}''' if pets else '<p style="margin: 0; opacity: 0.8;">Sin mascotas registradas</p>'}
-              {f'<p style="margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.8;">... y {len(pets) - 5} más</p>' if len(pets) > 5 else ''}
-            </div>
-            
-            <div class="actions">
-              <a href="/owners/{owner.id}/view" class="btn btn-primary">Ver detalles completos</a>
+              {pets_html}
             </div>
           </div>
             """
@@ -998,16 +994,12 @@ def search_owners_view(
         html_content += """
           <div class="no-results" style="grid-column: 1 / -1;">
             <div class="no-results-icon">🔍</div>
-            <p>No se encontraron dueños con los filtros seleccionados.</p>
+            <p style="font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 600;">No se encontraron dueños</p>
             <p style="font-size: 1rem; color: #999;">Intenta ajustar los criterios de búsqueda.</p>
           </div>
         """
     
     html_content += """
-        </div>
-        
-        <div style="text-align: center;">
-          <a href="/vet/clinica" class="back-link">⬅️ Volver a Atención Clínica</a>
         </div>
       </div>
     </body>
@@ -1372,15 +1364,6 @@ def get_owner_view(owner_id: int, db: Session = Depends(get_db)):
     """
     
     return html_content
-
-
-@router.get("/{owner_id}", response_model=OwnerRead)
-def get_owner(owner_id: int, db: Session = Depends(get_db)):
-    owner = db.get(models.Owner, owner_id)
-    if not owner:
-        raise HTTPException(status_code=404, detail="Owner not found")
-    return owner
-
 
 @router.get("/{owner_id}/edit", response_class=HTMLResponse)
 def edit_owner_form(owner_id: int, db: Session = Depends(get_db)):
@@ -1917,3 +1900,11 @@ def delete_owner(owner_id: int, db: Session = Depends(get_db)):
     
     return html_content
 
+
+@router.get("/{owner_id}", response_model=OwnerRead)
+def get_owner(owner_id: int, db: Session = Depends(get_db)):
+    """Obtener información de un dueño por ID (API JSON)."""
+    owner = db.get(models.Owner, owner_id)
+    if not owner:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    return owner
