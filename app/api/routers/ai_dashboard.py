@@ -8,11 +8,30 @@ router = APIRouter()
 @router.get("/", response_class=HTMLResponse)
 def ai_dashboard():
     """Dashboard de predicción de afluencia con IA - Rediseñado sin scroll"""
-    today = date.today().isoformat()
     # Obtener fecha formateada en español
     from datetime import datetime
+    import locale
+    
+    # Intentar configurar el locale a español
+    try:
+        locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    except:
+        try:
+            locale.setlocale(locale.LC_TIME, 'Spanish_Spain.1252')
+        except:
+            pass  # Si falla, usar el locale por defecto
+    
     now = datetime.now()
-    fecha_formateada = now.strftime('%A %d de %B de %Y').title()
+    today = now.date().isoformat()
+    
+    # Crear fecha formateada manualmente para asegurar español
+    dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    
+    dia_semana = dias_semana[now.weekday()]
+    mes = meses[now.month]
+    fecha_formateada = f"{dia_semana} {now.day} de {mes} de {now.year}"
     
     html_content = f"""
 <!doctype html>
@@ -132,8 +151,11 @@ def ai_dashboard():
     </div>
   </div>
   <script>
+    // Fecha actual del servidor (evita problemas de zona horaria del cliente)
+    const SERVER_DATE = '{today}';
+    
     function getWeekNumber() {{
-      const now = new Date();
+      const now = new Date(SERVER_DATE);
       const start = new Date(now.getFullYear(), 0, 1);
       const diff = now - start;
       const oneWeek = 1000 * 60 * 60 * 24 * 7;
@@ -144,16 +166,28 @@ def ai_dashboard():
     }}
     updateCurrentDate();
     function formatDate(dateStr) {{
-      const date = new Date(dateStr);
+      // Parsear la fecha como fecha local para evitar problemas de zona horaria
+      const parts = dateStr.split('-');
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
       const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-      return days[date.getDay()] + ' ' + date.getDate() + '/' + (date.getMonth() + 1);
+      return days[date.getDay()] + ' ' + date.getDate() + '/' + (parseInt(parts[1]));
     }}
     async function loadWeatherData() {{
       try {{
         const response = await fetch('/ai/forecast?days=5');
         const data = await response.json();
         if (data.forecast && data.forecast.length > 0) {{
-          const today = data.forecast[0];
+          // Usar la fecha del servidor
+          const currentDate = SERVER_DATE;
+          
+          // Buscar el pronóstico de hoy
+          let today = data.forecast.find(day => day.date === currentDate);
+          
+          // Si no se encuentra el día actual, usar el primer día disponible
+          if (!today) {{
+            today = data.forecast[0];
+          }}
+          
           const weatherCards = document.querySelectorAll('#weatherToday .data-item .value');
           weatherCards[0].textContent = Math.round(today.temp_avg) + '°C';
           weatherCards[1].textContent = Math.round(today.humidity) + '%';
@@ -161,7 +195,18 @@ def ai_dashboard():
           weatherCards[3].textContent = Math.round(today.windspeed_max) + ' km/h';
           const forecastMini = document.getElementById('forecastMini');
           forecastMini.innerHTML = '';
-          data.forecast.slice(1, 4).forEach(day => {{
+          
+          // Filtrar pronósticos futuros (desde mañana)
+          // Parsear SERVER_DATE manualmente para evitar problemas de zona horaria
+          const parts = SERVER_DATE.split('-');
+          const tomorrow = new Date(parts[0], parts[1] - 1, parseInt(parts[2]) + 1);
+          const tomorrowStr = tomorrow.getFullYear() + '-' + 
+                              String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(tomorrow.getDate()).padStart(2, '0');
+          
+          const futureDays = data.forecast.filter(day => day.date >= tomorrowStr).slice(0, 3);
+          
+          futureDays.forEach(day => {{
             const rainIcon = day.precipitation_probability > 50 ? '🌧️' : day.precipitation_probability > 30 ? '⛅' : '☀️';
             const dayCard = document.createElement('div');
             dayCard.className = 'forecast-mini-item';
@@ -186,9 +231,8 @@ def ai_dashboard():
       resultsDiv.classList.add('show');
       resultsContent.innerHTML = '<div class="loading">Analizando datos climáticos y generando predicción</div>';
       try {{
-        // Obtener fecha actual
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
+        // Usar fecha actual del servidor
+        const todayStr = SERVER_DATE;
         
         const forecastResponse = await fetch('/ai/forecast?days=7');
         const forecastData = await forecastResponse.json();

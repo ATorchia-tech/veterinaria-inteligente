@@ -44,8 +44,15 @@ def get_forecast(days: int = 5):
 
 @router.get("/predict", response_model=AffluencePrediction)
 def predict(day: date | None = None):
-    # Obtener features de clima (stub) + fecha
-    f = get_weather_features(day)
+    """
+    Predice la afluencia de clientes para un día específico.
+    Si no se especifica día, usa el día actual del servidor.
+    """
+    # Si no se proporciona día, usar el día actual
+    target_day = day if day else date.today()
+    
+    # Obtener features de clima + fecha
+    f = get_weather_features(target_day)
     label, prob = predict_affluence(f)
     return AffluencePrediction(date=f["date"], label=label, probability=prob)
 

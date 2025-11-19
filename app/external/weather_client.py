@@ -43,6 +43,10 @@ def get_weather_forecast_buenos_aires(days: int = 5) -> List[Dict]:
         daily_data = data.get("daily", {})
         dates = daily_data.get("time", [])
         
+        if not dates:
+            print("No se obtuvieron fechas del pronóstico, usando datos simulados")
+            return _get_simulated_forecast(days)
+        
         forecast = []
         for i in range(len(dates)):
             temp_max = daily_data.get("temperature_2m_max", [])[i]
@@ -51,8 +55,8 @@ def get_weather_forecast_buenos_aires(days: int = 5) -> List[Dict]:
             
             forecast.append({
                 "date": datetime.strptime(dates[i], "%Y-%m-%d").date(),
-                "temp_max": temp_max or 25.0,
-                "temp_min": temp_min or 15.0,
+                "temp_max": temp_max if temp_max is not None else 25.0,
+                "temp_min": temp_min if temp_min is not None else 15.0,
                 "temp_avg": temp_avg,
                 "precipitation_probability": daily_data.get("precipitation_probability_max", [])[i] or 0.0,
                 "precipitation_sum": daily_data.get("precipitation_sum", [])[i] or 0.0,
@@ -77,10 +81,30 @@ def _get_simulated_forecast(days: int = 5) -> List[Dict]:
     forecast = []
     base_date = date.today()
     
-    # Temperaturas típicas de Buenos Aires en noviembre (primavera)
+    # Temperaturas típicas de Buenos Aires según el mes
+    month = base_date.month
+    
+    # Definir rangos de temperatura por mes (Buenos Aires)
+    temp_ranges = {
+        1: (20, 30),   # Enero (verano)
+        2: (20, 29),   # Febrero (verano)
+        3: (17, 26),   # Marzo (otoño)
+        4: (14, 22),   # Abril (otoño)
+        5: (11, 18),   # Mayo (otoño)
+        6: (8, 15),    # Junio (invierno)
+        7: (8, 15),    # Julio (invierno)
+        8: (9, 17),    # Agosto (invierno)
+        9: (12, 19),   # Septiembre (primavera)
+        10: (15, 22),  # Octubre (primavera)
+        11: (17, 25),  # Noviembre (primavera)
+        12: (19, 28),  # Diciembre (verano)
+    }
+    
+    temp_min, temp_max = temp_ranges.get(month, (15, 25))
+    
     for i in range(days):
         day = base_date + timedelta(days=i)
-        temp_avg = random.uniform(18, 26)
+        temp_avg = random.uniform(temp_min, temp_max)
         
         forecast.append({
             "date": day,
@@ -103,8 +127,12 @@ def get_weather_features(day: date | None = None) -> dict:
     """
     d = day or date.today()
     
-    # Obtener pronóstico de 7 días
-    forecast = get_weather_forecast_buenos_aires(7)
+    # Calcular cuántos días de diferencia hay desde hoy
+    days_from_today = (d - date.today()).days
+    
+    # Obtener pronóstico de hasta 16 días (máximo de la API)
+    forecast_days = min(max(days_from_today + 2, 7), 16)
+    forecast = get_weather_forecast_buenos_aires(forecast_days)
     
     # Buscar el día específico en el pronóstico
     weather_data = None
@@ -113,21 +141,24 @@ def get_weather_features(day: date | None = None) -> dict:
             weather_data = daily
             break
     
-    # Si no se encuentra el día, usar el primer día del pronóstico
+    # Si no se encuentra el día exacto, buscar el más cercano
     if not weather_data and forecast:
-        weather_data = forecast[0]
+        # Ordenar por diferencia de fecha y tomar el más cercano
+        closest = min(forecast, key=lambda x: abs((x["date"] - d).days))
+        weather_data = closest
     
-    # Si aún no hay datos, usar valores por defecto
+    # Si aún no hay datos, usar valores por defecto realistas para Buenos Aires
     if not weather_data:
+        # Valores por defecto para Buenos Aires en noviembre (primavera)
         weather_data = {
-            "temp_avg": 20.0,
-            "precipitation_probability": 20.0,
+            "temp_avg": 22.0,
+            "precipitation_probability": 25.0,
         }
     
     return {
         "date": d,
-        "temp_avg": weather_data.get("temp_avg", 20.0),
-        "precip_prob": weather_data.get("precipitation_probability", 20.0) / 100.0,
+        "temp_avg": weather_data.get("temp_avg", 22.0),
+        "precip_prob": weather_data.get("precipitation_probability", 25.0) / 100.0,
         "is_weekend": 1 if d.weekday() >= 5 else 0,
         "month": d.month,
         "weekday": d.weekday(),
