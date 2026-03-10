@@ -3,11 +3,9 @@ from pydantic import BaseModel, EmailStr, ConfigDict, Field
 
 
 class OwnerBase(BaseModel):
-    name: str = Field(..., json_schema_extra={"example": "Juan Pérez"})
-    phone: str | None = Field(None, json_schema_extra={"example": "123456"})
-    email: EmailStr | None = Field(
-        None, json_schema_extra={"example": "juan@example.com"}
-    )
+    name: str = Field(..., example="Juan Pérez")
+    phone: str | None = Field(None, example="123456")
+    email: EmailStr | None = Field(None, example="juan@example.com")
 
 
 class OwnerCreate(OwnerBase):

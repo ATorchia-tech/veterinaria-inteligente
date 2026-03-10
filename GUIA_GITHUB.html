@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Guía Rápida - Subir a GitHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .step {
+            background: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        code {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 5px solid;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #0c5460;
+            color: #0c5460;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #856404;
+            color: #856404;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #155724;
+            color: #155724;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid #667eea;
+        }
+        
+        .card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .checklist li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 2rem;
+            text-align: center;
+            border-top: 2px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Guía Rápida: Subir a GitHub</h1>
+            <p>Veterinaria Inteligente - IFTS-12</p>
+        </div>
+        
+        <div class="content">
+            <!-- OPCIÓN MÁS FÁCIL -->
+            <div class="section" style="border-left-color: #28a745;">
+                <h2>⚡ OPCIÓN MÁS FÁCIL - Un Solo Click</h2>
+                
+                <div class="alert alert-success">
+                    <strong>🎯 Recomendado para principiantes</strong><br>
+                    Este script hace todo automáticamente por ti.
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>Abre PowerShell en la carpeta del proyecto</strong>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Ejecuta este comando:</strong>
+                    <pre><code>powershell -ExecutionPolicy Bypass -File .\scripts\subir_a_github.ps1</code></pre>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>Sigue las instrucciones en pantalla</strong>
+                    <p>El script te guiará paso a paso.</p>
+                </div>
+            </div>
+            
+            <!-- PASOS MANUALES -->
+            <div class="section">
+                <h2>📝 Pasos Manuales (Alternativa)</h2>
+                
+                <h3>Paso 1: Verificar el Estado</h3>
+                <pre><code>git status</code></pre>
+                
+                <h3>Paso 2: Agregar Archivos</h3>
+                <pre><code>git add .</code></pre>
+                
+                <h3>Paso 3: Crear Commit</h3>
+                <pre><code>git commit -m "Proyecto Veterinaria Inteligente IFTS-12 completo"</code></pre>
+                
+                <h3>Paso 4: Configurar Repositorio Remoto</h3>
+                <div class="alert alert-warning">
+                    <strong>⚠️ Importante:</strong> Reemplaza <code>TU-USUARIO</code> con tu usuario real de GitHub
+                </div>
+                <pre><code>git remote set-url origin https://github.com/TU-USUARIO/veterinaria-inteligente.git</code></pre>
+                
+                <h3>Paso 5: Subir a GitHub</h3>
+                <pre><code>git push -u origin main</code></pre>
+            </div>
+            
+            <!-- CREAR TOKEN -->
+            <div class="section" style="border-left-color: #ffc107;">
+                <h2>🔑 Crear Personal Access Token</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ GitHub NO acepta contraseñas normales</strong><br>
+                    Necesitas crear un "Personal Access Token" (es como una contraseña especial)
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    Ve a: <a href="https://github.com/settings/tokens" target="_blank">https://github.com/settings/tokens</a>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">2</span>
+                    Click en <strong>"Generate new token"</strong> → <strong>"Generate new token (classic)"</strong>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Dale un nombre: <code>VS Code - Veterinaria</code>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">4</span>
+                    Marca el checkbox <strong>"repo"</strong> (para acceso completo)
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">5</span>
+                    Click en <strong>"Generate token"</strong> al final
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">6</span>
+                    <strong>COPIA el token</strong> (solo lo verás una vez - guárdalo en un lugar seguro)
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">7</span>
+                    Usa este token como contraseña cuando Git te lo pida
+                </div>
+            </div>
+            
+            <!-- AGREGAR COLABORADORES -->
+            <div class="section" style="border-left-color: #17a2b8;">
+                <h2>👥 Agregar Compañeros y Docente</h2>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    En tu repositorio de GitHub, ve a <strong>Settings</strong> (Configuración)
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">2</span>
+                    En el menú izquierdo, click en <strong>Collaborators</strong>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">3</span>
+                    Click en <strong>"Add people"</strong>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">4</span>
+                    Escribe el nombre de usuario o email de cada compañero
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">5</span>
+                    Repite para: A. Mercado, S. Paniagua, F. Hernández y el docente
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>💡 Tip:</strong> Ellos recibirán un email de invitación. Deben aceptarla para tener acceso.
+                </div>
+            </div>
+            
+            <!-- DESPLEGAR EN LA NUBE -->
+            <div class="section" style="border-left-color: #6f42c1;">
+                <h2>🌐 Desplegar en la Nube (URL Pública)</h2>
+                
+                <div class="alert alert-info">
+                    <strong>🎯 Objetivo:</strong> Que tus compañeros y docente accedan desde su navegador SIN instalar nada
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>⭐ Render.com (RECOMENDADO)</h4>
+                        <ul>
+                            <li>✅ 100% Gratis</li>
+                            <li>✅ No requiere tarjeta</li>
+                            <li>✅ 5 minutos de setup</li>
+                            <li>✅ Ya incluimos <code>render.yaml</code></li>
+                        </ul>
+                        <a href="https://render.com" target="_blank" class="btn">Ir a Render.com</a>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>🚂 Railway.app</h4>
+                        <ul>
+                            <li>✅ Gratis (500 hrs/mes)</li>
+                            <li>✅ Muy rápido</li>
+                            <li>✅ Fácil configuración</li>
+                        </ul>
+                        <a href="https://railway.app" target="_blank" class="btn">Ir a Railway</a>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>🐍 PythonAnywhere</h4>
+                        <ul>
+                            <li>✅ Gratis</li>
+                            <li>✅ No se "duerme"</li>
+                            <li>✅ Especializado en Python</li>
+                        </ul>
+                        <a href="https://www.pythonanywhere.com" target="_blank" class="btn">Ir a PythonAnywhere</a>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success" style="margin-top: 1rem;">
+                    <strong>📖 Tutorial Completo:</strong> Consulta <code>TUTORIAL_GITHUB.md</code> para instrucciones detalladas de cada servicio.
+                </div>
+            </div>
+            
+            <!-- CHECKLIST -->
+            <div class="section" style="border-left-color: #28a745;">
+                <h2>✅ Checklist Final</h2>
+                
+                <ul class="checklist">
+                    <li>Código subido a GitHub</li>
+                    <li>3 compañeros agregados como colaboradores</li>
+                    <li>Docente agregado como colaborador</li>
+                    <li>App desplegada en Render/Railway (opcional pero recomendado)</li>
+                    <li>Email enviado con los enlaces</li>
+                    <li>README.md actualizado</li>
+                    <li>Archivo TUTORIAL_GITHUB.md en el proyecto</li>
+                </ul>
+            </div>
+            
+            <!-- ENLACES ÚTILES -->
+            <div class="section">
+                <h2>🔗 Enlaces Útiles</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>📚 Documentación</h4>
+                        <a href="TUTORIAL_GITHUB.md" class="btn">Ver Tutorial Completo</a>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>🔑 GitHub Token</h4>
+                        <a href="https://github.com/settings/tokens" target="_blank" class="btn">Crear Token</a>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>🌐 Render.com</h4>
+                        <a href="https://render.com" target="_blank" class="btn">Desplegar Gratis</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>🎓 Proyecto Veterinaria Inteligente</h3>
+            <p><strong>IFTS-12 - 2025</strong></p>
+            <p>Integrantes: A. Mercado, S. Paniagua, F. Hernández, A. Torchia</p>
+        </div>
+    </div>
+</body>
+</html>

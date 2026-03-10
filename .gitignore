@@ -33,21 +33,17 @@ Thumbs.db
 
 # Databases / artifacts (decide per project)
 app.db
+veterinaria.db
+*.db
+*.db-shm
+*.db-wal
 
-# Logs
+# Logs y PIDs
 *.log
-.venv/
-app.db
-.env
-__pycache__/
-.pytest_cache/
-.venv/
-app.db
-.env
-__pycache__/
-.pytest_cache/
-.vscode/
+*.pid
 .uvicorn.pid
+
+# Archivos temporales de Windows
+*.tmp
+~$*
 VETERINARIA_INTELIGENTE_IFTS12_1_0/
-app/ml/models/
-*.joblib

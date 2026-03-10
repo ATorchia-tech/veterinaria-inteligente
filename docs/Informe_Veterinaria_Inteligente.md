@@ -1,7 +1,65 @@
 # Informe del Proyecto: Veterinaria Inteligente
 
 Autor: ATorchia-tech (GitHub)
-Fecha: 04/11/2025
+Fecha: 05/11/2025
+
+---
+
+## Guía breve para personas no técnicas
+
+Esta sección explica el sistema con palabras simples, sin jerga técnica. Más abajo queda la descripción detallada para quienes necesiten profundidad.
+
+### ¿Qué es?
+- Es una aplicación que ayuda a gestionar una clínica veterinaria: dueños, mascotas, turnos, vacunas y algunos análisis con Inteligencia Artificial (IA).
+- Se puede usar desde el navegador web en tu computadora. No hace falta saber programar.
+
+### ¿Qué puedo hacer con el sistema?
+- Cargar y consultar dueños y mascotas.
+- Agendar turnos con fecha, hora y motivo.
+- Ver información de vacunación y próximos vencimientos.
+- Ver un resumen de cuántos registros hay en la base de datos (totales) y también un detalle tabular.
+- Usar módulos de IA para tareas útiles:
+  - Estimar cuánta afluencia de pacientes habrá un día.
+  - Analizar si un comentario es positivo o negativo.
+  - Estimar probabilidad de ausentismo (no-presentación) en un turno.
+  - Detectar la “intención” de un mensaje (por ejemplo: pedir turno, consultar precios, horarios, vacunación, etc.).
+
+### ¿Cómo está construido? (sin tecnicismos)
+- Pensalo como tres piezas que trabajan juntas:
+  1) Una “puerta de entrada” que recibe las acciones (crear, listar, consultar) y devuelve resultados; a esto lo llamamos API.
+  2) Una página simple para operar rápido desde el navegador: http://127.0.0.1:8000/ui
+  3) Una “libreta ordenada” donde se guardan los datos; esa libreta es la base de datos.
+- Todo funciona localmente en tu computadora.
+
+### ¿Cómo se guardan los datos?
+- Usamos una base de datos llamada SQLite. Imaginá una planilla con varias hojas:
+  - Dueños (Owners)
+  - Mascotas (Pets)
+  - Turnos (Appointments)
+  - Fichas clínicas (Clinical Records)
+  - Vacunaciones (Vaccinations)
+- Cada hoja tiene columnas claras (por ejemplo, en Mascotas: nombre, especie, raza, dueño, fecha de nacimiento). Las hojas están relacionadas: una mascota pertenece a un dueño; un turno pertenece a una mascota; etc.
+
+### ¿Qué hace la IA y cómo funciona en sencillo?
+- La IA usa ejemplos guardados para “aprender” patrones y dar una respuesta probable. No decide sola sobre pacientes; sólo sugiere.
+- Módulos incluidos:
+  - Afluencia: predice si un día será de baja, media o alta concurrencia, para planificar mejor.
+  - Sentimiento: clasifica un texto como positivo o negativo.
+  - No-show (ausentismo): estima la probabilidad de que un turno no se presente.
+  - Intenciones: clasifica el motivo de un mensaje (turnos, precios, horarios, vacunación, etc.) y ofrece las 3 intenciones más probables.
+- Importante: si no hay suficiente información para un caso, el sistema usa reglas simples como respaldo.
+
+### ¿Cómo lo uso desde el navegador?
+- Página de carga rápida (formularios simples):
+  - http://127.0.0.1:8000/ui
+- Ver totales (en formato formulario):
+  - http://127.0.0.1:8000/admin/db_counts_form
+- Ver detalle tabular de datos (con límite ajustable):
+  - http://127.0.0.1:8000/admin/db_details
+- Ver toda la documentación interactiva de la API (para explorar funcionalidades):
+  - http://127.0.0.1:8000/docs
+
+> Sugerencia: primero abrí /ui, cargá algunos datos (o usa las tareas de “semilla” para datos de prueba) y luego mirá los totales y el detalle.
 
 ---
 

@@ -2,7 +2,10 @@ from datetime import date
 from fastapi import APIRouter
 
 from app.ml.predict import predict_affluence
-from app.external.weather_client import get_weather_features
+from app.external.weather_client import (
+    get_weather_features,
+    get_weather_forecast_buenos_aires,
+)
 from app.schemas.common import AffluencePrediction, NoShowPrediction
 from app.schemas.sentiment import SentimentRequest, SentimentResponse
 from app.schemas.nlp import MessageRequest, ClassificationResponse
@@ -15,10 +18,41 @@ from app.ml.intent import predict_intent, predict_intent_topk
 router = APIRouter()
 
 
+@router.get("/forecast")
+def get_forecast(days: int = 5):
+    """
+    Obtiene el pronóstico del tiempo de Buenos Aires para los próximos días.
+    """
+    forecast = get_weather_forecast_buenos_aires(days)
+    return {
+        "location": "Buenos Aires, Argentina",
+        "forecast": [
+            {
+                "date": str(day["date"]),
+                "temp_max": round(day["temp_max"], 1),
+                "temp_min": round(day["temp_min"], 1),
+                "temp_avg": round(day["temp_avg"], 1),
+                "precipitation_probability": round(day["precipitation_probability"], 1),
+                "precipitation_sum": round(day["precipitation_sum"], 1),
+                "windspeed_max": round(day["windspeed_max"], 1),
+                "humidity": round(day["humidity"], 1),
+            }
+            for day in forecast
+        ],
+    }
+
+
 @router.get("/predict", response_model=AffluencePrediction)
 def predict(day: date | None = None):
-    # Obtener features de clima (stub) + fecha
-    f = get_weather_features(day)
+    """
+    Predice la afluencia de clientes para un día específico.
+    Si no se especifica día, usa el día actual del servidor.
+    """
+    # Si no se proporciona día, usar el día actual
+    target_day = day if day else date.today()
+    
+    # Obtener features de clima + fecha
+    f = get_weather_features(target_day)
     label, prob = predict_affluence(f)
     return AffluencePrediction(date=f["date"], label=label, probability=prob)
 

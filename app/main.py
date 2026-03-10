@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.database import Base, engine
@@ -17,6 +16,11 @@ from app.api.routers.vaccinations import router as vaccinations_router
 from app.api.routers.reports import router as reports_router
 from app.api.routers.ai import router as ai_router
 from app.api.routers.ui import router as ui_router
+from app.api.routers.vet_ui import router as vet_ui_router
+from app.api.routers.vet_clinica import router as vet_clinica_router
+from app.api.routers.vet_gestion import router as vet_gestion_router
+from app.api.routers.home import router as home_router
+from app.api.routers.ai_dashboard import router as ai_dashboard_router
 
 
 def create_app() -> FastAPI:
@@ -35,6 +39,7 @@ def create_app() -> FastAPI:
     Base.metadata.create_all(bind=engine)
 
     # Routers
+    app.include_router(home_router, tags=["home"], include_in_schema=False)
     app.include_router(health_router)
     app.include_router(admin_router, tags=["admin"])
     app.include_router(owners_router, prefix="/owners", tags=["owners"])
@@ -49,15 +54,30 @@ def create_app() -> FastAPI:
     )
     app.include_router(reports_router, prefix="/reports", tags=["reports"])
     app.include_router(ai_router, prefix="/ai", tags=["ai"])
+    app.include_router(
+        ai_dashboard_router,
+        prefix="/ai-dashboard",
+        tags=["ai-dashboard"],
+        include_in_schema=False,
+    )
     app.include_router(ui_router, prefix="/ui", tags=["ui"], include_in_schema=False)
+    app.include_router(
+        vet_ui_router, prefix="/vet", tags=["vet-ui"], include_in_schema=False
+    )
+    app.include_router(
+        vet_clinica_router,
+        prefix="/vet/clinica",
+        tags=["vet-clinica"],
+        include_in_schema=False,
+    )
+    app.include_router(
+        vet_gestion_router,
+        prefix="/vet/gestion",
+        tags=["vet-gestion"],
+        include_in_schema=False,
+    )
 
     return app
 
 
 app = create_app()
-
-
-# Ruta raíz: redirige a la documentación interactiva
-@app.get("/", include_in_schema=False)
-def root():
-    return RedirectResponse(url="/docs")

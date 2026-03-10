@@ -1,20 +1,16 @@
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class ClinicalRecordBase(BaseModel):
-    symptoms: str | None = Field(
-        None, json_schema_extra={"example": "tos, decaimiento"}
-    )
-    diagnosis: str | None = Field(None, json_schema_extra={"example": "resfriado leve"})
-    treatment: str | None = Field(
-        None, json_schema_extra={"example": "reposo, hidratación"}
-    )
-    medications: str | None = Field(None, json_schema_extra={"example": "vitaminas"})
+    symptoms: str | None = Field(None, example="tos, decaimiento")
+    diagnosis: str | None = Field(None, example="resfriado leve")
+    treatment: str | None = Field(None, example="reposo, hidratación")
+    medications: str | None = Field(None, example="vitaminas")
 
 
 class ClinicalRecordCreate(ClinicalRecordBase):
-    pet_id: int = Field(..., json_schema_extra={"example": 1})
+    pet_id: int = Field(..., example=1)
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -30,6 +26,7 @@ class ClinicalRecordCreate(ClinicalRecordBase):
 
 class ClinicalRecordRead(ClinicalRecordBase):
     id: int
+    visit_date: date
     created_at: datetime
     updated_at: datetime | None = None
     pet_id: int
@@ -39,6 +36,7 @@ class ClinicalRecordRead(ClinicalRecordBase):
             "example": {
                 "id": 1,
                 "pet_id": 1,
+                "visit_date": "2025-11-11",
                 "symptoms": "tos, decaimiento",
                 "diagnosis": "resfriado leve",
                 "treatment": "reposo, hidratación",
