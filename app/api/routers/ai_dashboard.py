@@ -1,6 +1,5 @@
 ﻿from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
-from datetime import date
 
 router = APIRouter()
 
@@ -11,28 +10,49 @@ def ai_dashboard():
     # Obtener fecha formateada en español
     from datetime import datetime
     import locale
-    
+
     # Intentar configurar el locale a español
     try:
-        locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
-    except:
+        locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+    except Exception:
         try:
-            locale.setlocale(locale.LC_TIME, 'Spanish_Spain.1252')
-        except:
+            locale.setlocale(locale.LC_TIME, "Spanish_Spain.1252")
+        except Exception:
             pass  # Si falla, usar el locale por defecto
-    
+
     now = datetime.now()
     today = now.date().isoformat()
-    
+
     # Crear fecha formateada manualmente para asegurar español
-    dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
-    meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    
+    dias_semana = [
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+        "Domingo",
+    ]
+    meses = [
+        "",
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+    ]
+
     dia_semana = dias_semana[now.weekday()]
     mes = meses[now.month]
     fecha_formateada = f"{dia_semana} {now.day} de {mes} de {now.year}"
-    
+
     html_content = f"""
 <!doctype html>
 <html lang="es">

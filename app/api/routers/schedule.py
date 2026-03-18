@@ -13,8 +13,7 @@ router = APIRouter()
 
 @router.get("/day", response_model=List[AppointmentRead])
 def agenda_diaria_json(
-    day: Optional[date] = Query(None),
-    db: Session = Depends(get_db)
+    day: Optional[date] = Query(None), db: Session = Depends(get_db)
 ):
     """Agenda diaria en formato JSON. Acepta 'day' como parámetro."""
     d = day or datetime.now().date()
@@ -22,7 +21,10 @@ def agenda_diaria_json(
     end = start + timedelta(days=1)
     q = (
         db.query(models.Appointment)
-        .filter(models.Appointment.appointment_date >= start, models.Appointment.appointment_date < end)
+        .filter(
+            models.Appointment.appointment_date >= start,
+            models.Appointment.appointment_date < end,
+        )
         .order_by(models.Appointment.appointment_date.asc())
     )
     return q.all()
@@ -30,8 +32,7 @@ def agenda_diaria_json(
 
 @router.get("/daily", response_class=HTMLResponse)
 def agenda_diaria_html(
-    date: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    date: Optional[str] = Query(None), db: Session = Depends(get_db)
 ):
     """Agenda diaria en formato HTML. Acepta 'date' como parámetro (YYYY-MM-DD)."""
     # Parsear fecha
@@ -42,23 +43,26 @@ def agenda_diaria_html(
             d = datetime.now().date()
     else:
         d = datetime.now().date()
-    
+
     start = datetime(d.year, d.month, d.day)
     end = start + timedelta(days=1)
-    
+
     appointments = (
         db.query(models.Appointment)
-        .filter(models.Appointment.appointment_date >= start, models.Appointment.appointment_date < end)
+        .filter(
+            models.Appointment.appointment_date >= start,
+            models.Appointment.appointment_date < end,
+        )
         .order_by(models.Appointment.appointment_date.asc())
         .all()
     )
-    
+
     # Calcular estadísticas
     total = len(appointments)
-    attended = sum(1 for a in appointments if str(a.status) == 'attended')
-    scheduled = sum(1 for a in appointments if str(a.status) == 'scheduled')
-    canceled = sum(1 for a in appointments if str(a.status) == 'canceled')
-    
+    attended = sum(1 for a in appointments if str(a.status) == "attended")
+    scheduled = sum(1 for a in appointments if str(a.status) == "scheduled")
+    canceled = sum(1 for a in appointments if str(a.status) == "canceled")
+
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -249,20 +253,20 @@ def agenda_diaria_html(
         
         <div class="appointments-grid">
     """
-    
+
     if appointments:
         for apt in appointments:
             apt_status = str(apt.status)
             status_text = {
-                'scheduled': 'Programado',
-                'attended': 'Atendido',
-                'canceled': 'Cancelado'
+                "scheduled": "Programado",
+                "attended": "Atendido",
+                "canceled": "Cancelado",
             }.get(apt_status, apt_status)
-            
-            time_str = apt.appointment_date.strftime('%H:%M')
-            pet_name = apt.pet.name if apt.pet else 'N/A'
-            owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else 'N/A'
-            
+
+            time_str = apt.appointment_date.strftime("%H:%M")
+            pet_name = apt.pet.name if apt.pet else "N/A"
+            owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else "N/A"
+
             html_content += f"""
           <div class="appointment-card {apt_status}">
             <div class="appointment-header">
@@ -295,7 +299,7 @@ def agenda_diaria_html(
             <p>😴 No hay turnos programados para esta fecha.</p>
           </div>
         """
-    
+
     html_content += """
         </div>
         
@@ -306,6 +310,5 @@ def agenda_diaria_html(
     </body>
     </html>
     """
-    
-    return html_content
 
+    return html_content

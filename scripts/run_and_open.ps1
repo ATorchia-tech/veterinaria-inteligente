@@ -1,6 +1,7 @@
 param(
   [string]$ApiHost = "127.0.0.1",
   [int]$ApiPort = 8000,
+  [string]$StartPath = "/",
   [switch]$NoReload,
   [switch]$Setup    # crea venv e instala dependencias si faltan
 )
@@ -19,6 +20,8 @@ function Test-ApiUp {
 }
 
 try {
+  if (-not $StartPath.StartsWith("/")) { $StartPath = "/$StartPath" }
+
   # Preparar entorno si se solicita o si no existe el venv
   $venvPath = Join-Path $root ".venv"
   $venvPy = Join-Path $venvPath "Scripts/python.exe"
@@ -40,8 +43,8 @@ try {
   }
 
   if (Test-ApiUp -Url $baseUrl) {
-    Write-Host "API ya está arriba en $baseUrl. Abriendo /docs..." -ForegroundColor Yellow
-    Start-Process "$baseUrl/docs"
+    Write-Host "API ya está arriba en $baseUrl. Abriendo $StartPath ..." -ForegroundColor Yellow
+    Start-Process "$baseUrl$StartPath"
     exit 0
   }
 
@@ -67,8 +70,8 @@ try {
     exit 1
   }
 
-  Write-Host "API lista. Abriendo documentación: $baseUrl/docs" -ForegroundColor Green
-  Start-Process "$baseUrl/docs"
+  Write-Host "API lista. Abriendo interfaz web: $baseUrl$StartPath" -ForegroundColor Green
+  Start-Process "$baseUrl$StartPath"
   # Guardar PID para poder detener desde otros scripts
   try { Set-Content -Path $pidFile -Value $proc.Id -Encoding ascii -Force } catch {}
   Write-Host "Servidor Uvicorn corriendo (PID=$($proc.Id)). Para detenerlo, cierra su ventana o usa: Stop-Process -Id $($proc.Id)" -ForegroundColor DarkGray

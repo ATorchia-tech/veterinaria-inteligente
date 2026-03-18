@@ -55,26 +55,38 @@ def create_pet_form(
     db.add(pet)
     db.commit()
     db.refresh(pet)
-    
+
     # Emoji según especie
     species_lower = species.lower()
-    if 'perro' in species_lower or 'dog' in species_lower:
-        species_emoji = '🐕'
-    elif 'gato' in species_lower or 'cat' in species_lower:
-        species_emoji = '🐈'
-    elif 'ave' in species_lower or 'pájaro' in species_lower or 'bird' in species_lower:
-        species_emoji = '🦜'
-    elif 'conejo' in species_lower or 'rabbit' in species_lower:
-        species_emoji = '🐰'
-    elif 'hámster' in species_lower or 'hamster' in species_lower:
-        species_emoji = '🐹'
+    if "perro" in species_lower or "dog" in species_lower:
+        species_emoji = "🐕"
+    elif "gato" in species_lower or "cat" in species_lower:
+        species_emoji = "🐈"
+    elif "ave" in species_lower or "pájaro" in species_lower or "bird" in species_lower:
+        species_emoji = "🦜"
+    elif "conejo" in species_lower or "rabbit" in species_lower:
+        species_emoji = "🐰"
+    elif "hámster" in species_lower or "hamster" in species_lower:
+        species_emoji = "🐹"
     else:
-        species_emoji = '🐾'
-    
-    breed_display = breed if breed else '<span style="color: #999; font-style: italic;">No especificado</span>'
-    birth_display = birth_date.strftime('%d/%m/%Y') if birth_date else '<span style="color: #999; font-style: italic;">No especificado</span>'
-    notes_display = notes if notes else '<span style="color: #999; font-style: italic;">Sin notas adicionales</span>'
-    
+        species_emoji = "🐾"
+
+    breed_display = (
+        breed
+        if breed
+        else '<span style="color: #999; font-style: italic;">No especificado</span>'
+    )
+    birth_display = (
+        birth_date.strftime("%d/%m/%Y")
+        if birth_date
+        else '<span style="color: #999; font-style: italic;">No especificado</span>'
+    )
+    notes_display = (
+        notes
+        if notes
+        else '<span style="color: #999; font-style: italic;">Sin notas adicionales</span>'
+    )
+
     # Generar HTML de confirmación
     html_content = f"""
     <!doctype html>
@@ -405,7 +417,7 @@ def create_pet_form(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -429,31 +441,45 @@ def list_pets_view(
     q = db.query(models.Pet).order_by(models.Pet.id.desc())
     total_count = q.count()
     pets = q.offset((page - 1) * page_size).limit(page_size).all()
-    
+
     total_pages = (total_count + page_size - 1) // page_size
-    
+
     # Generar filas de la tabla
     pet_rows = ""
     for pet in pets:
         # Emoji según especie
         species_lower = pet.species.lower()
-        if 'perro' in species_lower or 'dog' in species_lower:
-            species_emoji = '🐕'
-        elif 'gato' in species_lower or 'cat' in species_lower:
-            species_emoji = '🐈'
-        elif 'ave' in species_lower or 'pájaro' in species_lower or 'bird' in species_lower:
-            species_emoji = '🦜'
-        elif 'conejo' in species_lower or 'rabbit' in species_lower:
-            species_emoji = '🐰'
-        elif 'hámster' in species_lower or 'hamster' in species_lower:
-            species_emoji = '🐹'
+        if "perro" in species_lower or "dog" in species_lower:
+            species_emoji = "🐕"
+        elif "gato" in species_lower or "cat" in species_lower:
+            species_emoji = "🐈"
+        elif (
+            "ave" in species_lower
+            or "pájaro" in species_lower
+            or "bird" in species_lower
+        ):
+            species_emoji = "🦜"
+        elif "conejo" in species_lower or "rabbit" in species_lower:
+            species_emoji = "🐰"
+        elif "hámster" in species_lower or "hamster" in species_lower:
+            species_emoji = "🐹"
         else:
-            species_emoji = '🐾'
-        
-        breed_display = pet.breed if pet.breed else '<span style="color: #999;">-</span>'
-        birth_display = pet.birth_date.strftime('%d/%m/%Y') if pet.birth_date else '<span style="color: #999;">-</span>'
-        owner_name = pet.owner.name if pet.owner else '<span style="color: #999;">Sin dueño</span>'
-        
+            species_emoji = "🐾"
+
+        breed_display = (
+            pet.breed if pet.breed else '<span style="color: #999;">-</span>'
+        )
+        birth_display = (
+            pet.birth_date.strftime("%d/%m/%Y")
+            if pet.birth_date
+            else '<span style="color: #999;">-</span>'
+        )
+        owner_name = (
+            pet.owner.name
+            if pet.owner
+            else '<span style="color: #999;">Sin dueño</span>'
+        )
+
         pet_rows += f"""
         <tr>
             <td style="text-align: center; font-weight: 600;">#{pet.id}</td>
@@ -471,15 +497,15 @@ def list_pets_view(
             </td>
         </tr>
         """
-    
+
     # Controles de paginación
     pagination = ""
     if total_pages > 1:
-        prev_disabled = 'disabled' if page <= 1 else ''
-        next_disabled = 'disabled' if page >= total_pages else ''
+        prev_disabled = "disabled" if page <= 1 else ""
+        next_disabled = "disabled" if page >= total_pages else ""
         prev_page = max(1, page - 1)
         next_page = min(total_pages, page + 1)
-        
+
         pagination = f"""
         <div class="pagination">
             <a href="/pets/view?page={prev_page}&page_size={page_size}" class="btn-page" {prev_disabled}>← Anterior</a>
@@ -489,7 +515,7 @@ def list_pets_view(
         """
     else:
         pagination = f'<div class="pagination"><span class="page-info">Total: {total_count} mascotas</span></div>'
-    
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -748,7 +774,7 @@ def list_pets_view(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -757,37 +783,28 @@ def search_pets_view(
     name: Optional[str] = Query(None),
     species: Optional[str] = Query(None),
     owner_name: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Vista HTML de búsqueda de mascotas con filtros."""
     # Construir query
     query = db.query(models.Pet)
-    
+
     # Filtrar por nombre de mascota
     if name:
         query = query.filter(models.Pet.name.ilike(f"%{name}%"))
-    
+
     # Filtrar por especie
     if species:
         query = query.filter(models.Pet.species.ilike(f"%{species}%"))
-    
+
     # Filtrar por nombre de dueño
     if owner_name:
-        query = query.join(models.Owner).filter(models.Owner.name.ilike(f"%{owner_name}%"))
-    
+        query = query.join(models.Owner).filter(
+            models.Owner.name.ilike(f"%{owner_name}%")
+        )
+
     pets = query.order_by(models.Pet.name.asc()).all()
-    
-    # Construir descripción de filtros
-    filter_parts = []
-    if name:
-        filter_parts.append(f"Nombre: {name}")
-    if species:
-        filter_parts.append(f"Especie: {species}")
-    if owner_name:
-        filter_parts.append(f"Dueño: {owner_name}")
-    
-    filter_text = " | ".join(filter_parts) if filter_parts else "Sin filtros"
-    
+
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -1010,38 +1027,49 @@ def search_pets_view(
         <div class="main-content">
           <div class="pets-grid">
     """
-    
+
     if pets:
         for pet in pets:
             # Emoji de especie
             species_lower = pet.species.lower()
-            if 'perro' in species_lower or 'dog' in species_lower:
-                species_emoji = '🐕'
-            elif 'gato' in species_lower or 'cat' in species_lower:
-                species_emoji = '🐈'
-            elif 'ave' in species_lower or 'pájaro' in species_lower or 'bird' in species_lower:
-                species_emoji = '🦜'
-            elif 'conejo' in species_lower or 'rabbit' in species_lower:
-                species_emoji = '🐰'
-            elif 'hámster' in species_lower or 'hamster' in species_lower:
-                species_emoji = '🐹'
+            if "perro" in species_lower or "dog" in species_lower:
+                species_emoji = "🐕"
+            elif "gato" in species_lower or "cat" in species_lower:
+                species_emoji = "🐈"
+            elif (
+                "ave" in species_lower
+                or "pájaro" in species_lower
+                or "bird" in species_lower
+            ):
+                species_emoji = "🦜"
+            elif "conejo" in species_lower or "rabbit" in species_lower:
+                species_emoji = "🐰"
+            elif "hámster" in species_lower or "hamster" in species_lower:
+                species_emoji = "🐹"
             else:
-                species_emoji = '🐾'
-            
+                species_emoji = "🐾"
+
             # Calcular edad si hay fecha de nacimiento
             age_text = ""
             if pet.birth_date is not None:
                 from datetime import datetime
+
                 today = datetime.now().date()
                 age_years = (today - pet.birth_date).days // 365
-                age_text = f" - {age_years} años" if age_years >= 1 else " - Menos de 1 año"
-            
+                age_text = (
+                    f" - {age_years} años" if age_years >= 1 else " - Menos de 1 año"
+                )
+
             breed_text = pet.breed if pet.breed is not None else "No especificado"
-            notes_html = f'<div class="info-row"><span class="info-label">📝 Notas:</span><span class="info-value">{pet.notes}</span></div>' if pet.notes is not None else ''
-            
-            owner_phone = pet.owner.phone if pet.owner.phone else 'No especificado'
-            owner_email = pet.owner.email if pet.owner.email else 'No especificado'
-            
+            notes_html = (
+                f'<div class="info-row"><span class="info-label">📝 Notas:</span><span class="info-value">{pet.notes}</span></div>'
+                if pet.notes is not None
+                else ""
+            )
+
+            owner_phone = pet.owner.phone if pet.owner.phone else "No especificado"
+            owner_email = pet.owner.email if pet.owner.email else "No especificado"
+
             html_content += f"""
             <div class="pet-card">
               <div class="pet-header">
@@ -1084,7 +1112,7 @@ def search_pets_view(
               <p style="font-size: 0.95rem; color: #999;">Intenta ajustar los criterios de búsqueda.</p>
             </div>
         """
-    
+
     html_content += """
           </div>
         </div>
@@ -1096,7 +1124,7 @@ def search_pets_view(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1114,44 +1142,45 @@ def get_pet_view(pet_id: int, db: Session = Depends(get_db)):
     pet = db.get(models.Pet, pet_id)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
-    
+
     # Calcular edad
     if pet.birth_date is not None:
         from datetime import datetime
+
         today = datetime.now().date()
         age_years = (today - pet.birth_date).days // 365
         age_text = f"{age_years} años" if age_years >= 1 else "Menos de 1 año"
         birth_display = f"{pet.birth_date.strftime('%d/%m/%Y')} ({age_text})"
     else:
         birth_display = "No especificado"
-    
+
     breed_display = pet.breed if pet.breed is not None else "No especificado"
     notes_display = pet.notes if pet.notes is not None else "Sin notas"
-    
+
     # Emoji de especie
     species_lower = pet.species.lower()
-    if 'perro' in species_lower or 'dog' in species_lower:
-        species_emoji = '🐕'
-    elif 'gato' in species_lower or 'cat' in species_lower:
-        species_emoji = '🐈'
-    elif 'ave' in species_lower or 'pájaro' in species_lower or 'bird' in species_lower:
-        species_emoji = '🦜'
-    elif 'conejo' in species_lower or 'rabbit' in species_lower:
-        species_emoji = '🐰'
-    elif 'hámster' in species_lower or 'hamster' in species_lower:
-        species_emoji = '🐹'
+    if "perro" in species_lower or "dog" in species_lower:
+        species_emoji = "🐕"
+    elif "gato" in species_lower or "cat" in species_lower:
+        species_emoji = "🐈"
+    elif "ave" in species_lower or "pájaro" in species_lower or "bird" in species_lower:
+        species_emoji = "🦜"
+    elif "conejo" in species_lower or "rabbit" in species_lower:
+        species_emoji = "🐰"
+    elif "hámster" in species_lower or "hamster" in species_lower:
+        species_emoji = "🐹"
     else:
-        species_emoji = '🐾'
-    
+        species_emoji = "🐾"
+
     # Obtener récords clínicos
     records = pet.clinical_records if pet.clinical_records else []
-    
+
     # Obtener vacunas
     vaccinations = pet.vaccinations if pet.vaccinations else []
-    
+
     # Obtener turnos
     appointments = pet.appointments if pet.appointments else []
-    
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -1430,13 +1459,25 @@ def get_pet_view(pet_id: int, db: Session = Depends(get_db)):
           <div class="section">
             <h3>📋 Récords Clínicos</h3>
     """
-    
+
     if records:
         for record in sorted(records, key=lambda r: r.visit_date, reverse=True):
-            symptoms_html = f'<div class="list-item-text"><strong>Síntomas:</strong> {record.symptoms}</div>' if record.symptoms else ''
-            treatment_html = f'<div class="list-item-text"><strong>Tratamiento:</strong> {record.treatment}</div>' if record.treatment else ''
-            medications_html = f'<div class="list-item-text"><strong>Medicamentos:</strong> {record.medications}</div>' if record.medications else ''
-            
+            symptoms_html = (
+                f'<div class="list-item-text"><strong>Síntomas:</strong> {record.symptoms}</div>'
+                if record.symptoms
+                else ""
+            )
+            treatment_html = (
+                f'<div class="list-item-text"><strong>Tratamiento:</strong> {record.treatment}</div>'
+                if record.treatment
+                else ""
+            )
+            medications_html = (
+                f'<div class="list-item-text"><strong>Medicamentos:</strong> {record.medications}</div>'
+                if record.medications
+                else ""
+            )
+
             html_content += f"""
             <div class="list-item">
               <div class="list-item-title">🗓️ {record.visit_date.strftime('%d/%m/%Y')}</div>
@@ -1447,38 +1488,47 @@ def get_pet_view(pet_id: int, db: Session = Depends(get_db)):
             </div>
             """
     else:
-        html_content += '<div class="empty-state">Sin récords clínicos registrados</div>'
-    
+        html_content += (
+            '<div class="empty-state">Sin récords clínicos registrados</div>'
+        )
+
     html_content += """
           </div>
           
           <div class="section">
             <h3>💉 Vacunas</h3>
     """
-    
+
     if vaccinations:
         from datetime import datetime
+
         today = datetime.now().date()
         for vaccination in sorted(vaccinations, key=lambda v: v.due_date, reverse=True):
             # Calcular días hasta vencimiento
             days_until_due = (vaccination.due_date - today).days
-            
+
             # Determinar estado y estilo
             if days_until_due < 0:
                 status_badge = '<span class="badge badge-danger">⚠️ Vencida</span>'
-                border_color = '#f8d7da'
+                border_color = "#f8d7da"
                 days_text = f'<span style="color: #dc3545; font-weight: 600;">Vencida hace {abs(days_until_due)} días</span>'
             elif days_until_due <= 30:
-                status_badge = '<span class="badge badge-warning">⏰ Próxima a vencer</span>'
-                border_color = '#fff3cd'
+                status_badge = (
+                    '<span class="badge badge-warning">⏰ Próxima a vencer</span>'
+                )
+                border_color = "#fff3cd"
                 days_text = f'<span style="color: #856404; font-weight: 600;">Vence en {days_until_due} días</span>'
             else:
                 status_badge = '<span class="badge badge-success">✅ Vigente</span>'
-                border_color = '#d4edda'
+                border_color = "#d4edda"
                 days_text = f'<span style="color: #155724; font-weight: 600;">Vence en {days_until_due} días</span>'
-            
-            notes_html = f'<div class="list-item-text">📝 <strong>Notas:</strong> {vaccination.notes}</div>' if vaccination.notes else ''
-            
+
+            notes_html = (
+                f'<div class="list-item-text">📝 <strong>Notas:</strong> {vaccination.notes}</div>'
+                if vaccination.notes
+                else ""
+            )
+
             html_content += f"""
             <div class="list-item" style="border-left-color: {border_color}; border-left-width: 5px;">
               <div class="list-item-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
@@ -1497,57 +1547,68 @@ def get_pet_view(pet_id: int, db: Session = Depends(get_db)):
             """
     else:
         html_content += '<div class="empty-state">Sin vacunas registradas</div>'
-    
+
     html_content += """
           </div>
           
           <div class="section">
             <h3>📅 Turnos</h3>
     """
-    
+
     if appointments:
         from datetime import datetime
+
         today = datetime.now()
-        
-        for appointment in sorted(appointments, key=lambda a: a.appointment_date, reverse=True):
+
+        for appointment in sorted(
+            appointments, key=lambda a: a.appointment_date, reverse=True
+        ):
             # Determinar si es pasado o futuro
             is_past = appointment.appointment_date < today
-            
+
             # Estilo según estado
-            if appointment.status == 'attended':
+            if appointment.status == "attended":
                 status_badge = '<span class="badge badge-success">✅ Atendido</span>'
-                border_color = '#d4edda'
-            elif appointment.status == 'canceled':
+                border_color = "#d4edda"
+            elif appointment.status == "canceled":
                 status_badge = '<span class="badge badge-danger">❌ Cancelado</span>'
-                border_color = '#f8d7da'
-            elif appointment.status == 'scheduled':
+                border_color = "#f8d7da"
+            elif appointment.status == "scheduled":
                 if is_past:
-                    status_badge = '<span class="badge badge-warning">⏰ Pendiente (pasado)</span>'
-                    border_color = '#fff3cd'
+                    status_badge = (
+                        '<span class="badge badge-warning">⏰ Pendiente (pasado)</span>'
+                    )
+                    border_color = "#fff3cd"
                 else:
                     status_badge = '<span class="badge badge-info">📅 Programado</span>'
-                    border_color = '#d1ecf1'
+                    border_color = "#d1ecf1"
             else:
-                status_badge = f'<span class="badge badge-info">{appointment.status}</span>'
-                border_color = '#e0e0e0'
-            
+                status_badge = (
+                    f'<span class="badge badge-info">{appointment.status}</span>'
+                )
+                border_color = "#e0e0e0"
+
             # Calcular tiempo relativo
             time_diff = appointment.appointment_date - today
             if time_diff.days > 0:
-                time_text = f'En {time_diff.days} días'
+                time_text = f"En {time_diff.days} días"
             elif time_diff.days == 0:
                 hours = time_diff.seconds // 3600
                 if hours > 0:
-                    time_text = f'Hoy en {hours} horas'
+                    time_text = f"Hoy en {hours} horas"
                 else:
-                    time_text = 'Hoy'
+                    time_text = "Hoy"
             elif time_diff.days == -1:
-                time_text = 'Ayer'
+                time_text = "Ayer"
             else:
-                time_text = f'Hace {abs(time_diff.days)} días'
-            
-            notes_html = f'<div class="list-item-text" style="margin-top: 0.4rem;">📝 <strong>Notas:</strong> {appointment.notes}</div>' if appointment.notes else ''
-            
+                time_text = f"Hace {abs(time_diff.days)} días"
+
+            notes_html = (
+                f'<div class="list-item-text" style="margin-top: 0.4rem;">📝 <strong>Notas:</strong> {appointment.notes}</div>'
+                if appointment.notes
+                else ""
+            )
+
             html_content += f"""
             <div class="list-item" style="border-left-color: {border_color}; border-left-width: 5px;">
               <div class="list-item-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
@@ -1565,7 +1626,7 @@ def get_pet_view(pet_id: int, db: Session = Depends(get_db)):
             """
     else:
         html_content += '<div class="empty-state">Sin turnos registrados</div>'
-    
+
     html_content += f"""
           </div>
         </div>
@@ -1581,7 +1642,7 @@ def get_pet_view(pet_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1591,25 +1652,29 @@ def get_pet_clinical_history(pet_id: int, db: Session = Depends(get_db)):
     pet = db.get(models.Pet, pet_id)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
-    
+
     # Emoji de especie
     species_lower = pet.species.lower()
-    if 'perro' in species_lower or 'dog' in species_lower:
-        species_emoji = '🐕'
-    elif 'gato' in species_lower or 'cat' in species_lower:
-        species_emoji = '🐈'
-    elif 'ave' in species_lower or 'pájaro' in species_lower or 'bird' in species_lower:
-        species_emoji = '🦜'
-    elif 'conejo' in species_lower or 'rabbit' in species_lower:
-        species_emoji = '🐰'
-    elif 'hámster' in species_lower or 'hamster' in species_lower:
-        species_emoji = '🐹'
+    if "perro" in species_lower or "dog" in species_lower:
+        species_emoji = "🐕"
+    elif "gato" in species_lower or "cat" in species_lower:
+        species_emoji = "🐈"
+    elif "ave" in species_lower or "pájaro" in species_lower or "bird" in species_lower:
+        species_emoji = "🦜"
+    elif "conejo" in species_lower or "rabbit" in species_lower:
+        species_emoji = "🐰"
+    elif "hámster" in species_lower or "hamster" in species_lower:
+        species_emoji = "🐹"
     else:
-        species_emoji = '🐾'
-    
+        species_emoji = "🐾"
+
     # Obtener récords clínicos ordenados por fecha
-    records = sorted(pet.clinical_records, key=lambda r: r.visit_date, reverse=True) if pet.clinical_records else []
-    
+    records = (
+        sorted(pet.clinical_records, key=lambda r: r.visit_date, reverse=True)
+        if pet.clinical_records
+        else []
+    )
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -1836,33 +1901,45 @@ def get_pet_clinical_history(pet_id: int, db: Session = Depends(get_db)):
         <div class="main-content">
           <div class="content-wrapper">
     """
-    
+
     if records:
         html_content += """
             <div class="timeline">
         """
         for record in records:
-            symptoms_html = f"""
+            symptoms_html = (
+                f"""
             <div class="record-section">
               <span class="record-label">🔍 Síntomas:</span>
               <div class="record-value">{record.symptoms}</div>
             </div>
-            """ if record.symptoms else ""
-            
-            treatment_html = f"""
+            """
+                if record.symptoms
+                else ""
+            )
+
+            treatment_html = (
+                f"""
             <div class="record-section">
               <span class="record-label">💊 Tratamiento:</span>
               <div class="record-value">{record.treatment}</div>
             </div>
-            """ if record.treatment else ""
-            
-            medications_html = f"""
+            """
+                if record.treatment
+                else ""
+            )
+
+            medications_html = (
+                f"""
             <div class="record-section">
               <span class="record-label">💉 Medicamentos:</span>
               <div class="record-value">{record.medications}</div>
             </div>
-            """ if record.medications else ""
-            
+            """
+                if record.medications
+                else ""
+            )
+
             html_content += f"""
               <div class="timeline-item">
                 <div class="record-card">
@@ -1880,7 +1957,7 @@ def get_pet_clinical_history(pet_id: int, db: Session = Depends(get_db)):
                 </div>
               </div>
             """
-        
+
         html_content += """
             </div>
         """
@@ -1892,7 +1969,7 @@ def get_pet_clinical_history(pet_id: int, db: Session = Depends(get_db)):
               <p>Esta mascota aún no tiene consultas médicas registradas.</p>
             </div>
         """
-    
+
     html_content += f"""
           </div>
         </div>
@@ -1908,7 +1985,7 @@ def get_pet_clinical_history(pet_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1918,22 +1995,24 @@ def edit_pet_form(pet_id: int, db: Session = Depends(get_db)):
     pet = db.get(models.Pet, pet_id)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
-    
+
     # Emoji según especie
     species_emoji = {
-        'perro': '🐕',
-        'gato': '🐈',
-        'ave': '🦜',
-        'conejo': '🐰',
-        'hamster': '🐹',
-    }.get(str(pet.species).lower() if pet.species else '', '🐾')  # type: ignore
-    
-    birth_date_str = pet.birth_date.strftime('%Y-%m-%d') if pet.birth_date else ''  # type: ignore
-    owner_name = pet.owner.name if pet.owner else 'N/A'
-    
+        "perro": "🐕",
+        "gato": "🐈",
+        "ave": "🦜",
+        "conejo": "🐰",
+        "hamster": "🐹",
+    }.get(
+        str(pet.species).lower() if pet.species else "", "🐾"
+    )  # type: ignore
+
+    birth_date_str = pet.birth_date.strftime("%Y-%m-%d") if pet.birth_date else ""  # type: ignore
+    owner_name = pet.owner.name if pet.owner else "N/A"
+
     # Valores para selected en options
-    pet_species_str = str(pet.species) if pet.species else ''  # type: ignore
-    
+    pet_species_str = str(pet.species) if pet.species else ""  # type: ignore
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -2112,7 +2191,7 @@ def edit_pet_form(pet_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -2130,37 +2209,38 @@ def update_pet(
     pet = db.get(models.Pet, pet_id)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
-    
+
     # Actualizar campos
-    setattr(pet, 'name', name)  # type: ignore
-    setattr(pet, 'species', species)  # type: ignore
+    setattr(pet, "name", name)  # type: ignore
+    setattr(pet, "species", species)  # type: ignore
     if breed:
-        setattr(pet, 'breed', breed)  # type: ignore
+        setattr(pet, "breed", breed)  # type: ignore
     if birth_date:
         from datetime import datetime
+
         try:
-            birth_date_obj = datetime.strptime(birth_date, '%Y-%m-%d').date()
-            setattr(pet, 'birth_date', birth_date_obj)  # type: ignore
-        except:
+            birth_date_obj = datetime.strptime(birth_date, "%Y-%m-%d").date()
+            setattr(pet, "birth_date", birth_date_obj)  # type: ignore
+        except Exception:
             pass
     if notes:
-        setattr(pet, 'notes', notes)  # type: ignore
-    
+        setattr(pet, "notes", notes)  # type: ignore
+
     db.commit()
     db.refresh(pet)
-    
+
     # Emoji según especie
     species_emoji = {
-        'perro': '🐕',
-        'gato': '🐈',
-        'ave': '🦜',
-        'conejo': '🐰',
-        'hamster': '🐹',
-    }.get(species.lower(), '🐾')
-    
-    owner_name = pet.owner.name if pet.owner else 'N/A'
-    birth_date_display = pet.birth_date.strftime('%d/%m/%Y') if pet.birth_date else 'No especificada'  # type: ignore
-    
+        "perro": "🐕",
+        "gato": "🐈",
+        "ave": "🦜",
+        "conejo": "🐰",
+        "hamster": "🐹",
+    }.get(species.lower(), "🐾")
+
+    owner_name = pet.owner.name if pet.owner else "N/A"
+    birth_date_display = pet.birth_date.strftime("%d/%m/%Y") if pet.birth_date else "No especificada"  # type: ignore
+
     # Página de confirmación
     html_content = f"""
     <!doctype html>
@@ -2326,7 +2406,7 @@ def update_pet(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -2336,31 +2416,33 @@ def delete_pet(pet_id: int, db: Session = Depends(get_db)):
     pet = db.get(models.Pet, pet_id)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
-    
+
     # Contar registros relacionados
     records_count = len(pet.clinical_records) if pet.clinical_records else 0
     appointments_count = len(pet.appointments) if pet.appointments else 0
     vaccinations_count = len(pet.vaccinations) if pet.vaccinations else 0
-    
+
     # Emoji según especie
     species_emoji = {
-        'perro': '🐕',
-        'gato': '🐈',
-        'ave': '🦜',
-        'conejo': '🐰',
-        'hamster': '🐹',
-    }.get(str(pet.species).lower() if pet.species else '', '🐾')  # type: ignore
-    
+        "perro": "🐕",
+        "gato": "🐈",
+        "ave": "🦜",
+        "conejo": "🐰",
+        "hamster": "🐹",
+    }.get(
+        str(pet.species).lower() if pet.species else "", "🐾"
+    )  # type: ignore
+
     # Guardar info antes de eliminar
     pet_name = pet.name
     pet_species = pet.species
     pet_id_saved = pet.id
-    owner_name = pet.owner.name if pet.owner else 'N/A'
-    
+    owner_name = pet.owner.name if pet.owner else "N/A"
+
     # Eliminar (cascade eliminará turnos, registros clínicos, etc.)
     db.delete(pet)
     db.commit()
-    
+
     # Página de confirmación
     html_content = f"""
     <!doctype html>
@@ -2515,5 +2597,5 @@ def delete_pet(pet_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content

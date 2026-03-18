@@ -31,10 +31,18 @@ def create_owner_form(
     db.add(owner)
     db.commit()
     db.refresh(owner)
-    
-    phone_display = phone if phone else '<span style="color: #999; font-style: italic;">No especificado</span>'
-    email_display = email if email else '<span style="color: #999; font-style: italic;">No especificado</span>'
-    
+
+    phone_display = (
+        phone
+        if phone
+        else '<span style="color: #999; font-style: italic;">No especificado</span>'
+    )
+    email_display = (
+        email
+        if email
+        else '<span style="color: #999; font-style: italic;">No especificado</span>'
+    )
+
     # Generar HTML de confirmación
     html_content = f"""
     <!doctype html>
@@ -326,7 +334,7 @@ def create_owner_form(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -350,16 +358,22 @@ def list_owners_view(
     q = db.query(models.Owner).order_by(models.Owner.id.desc())
     total_count = q.count()
     owners = q.offset((page - 1) * page_size).limit(page_size).all()
-    
+
     total_pages = (total_count + page_size - 1) // page_size
-    
+
     # Generar filas de la tabla
     owner_rows = ""
     for owner in owners:
-        phone_display = owner.phone if owner.phone else '<span style="color: #999;">-</span>'
-        email_display = owner.email if owner.email else '<span style="color: #999;">-</span>'
-        created_display = owner.created_at.strftime('%d/%m/%Y %H:%M') if owner.created_at else '-'
-        
+        phone_display = (
+            owner.phone if owner.phone else '<span style="color: #999;">-</span>'
+        )
+        email_display = (
+            owner.email if owner.email else '<span style="color: #999;">-</span>'
+        )
+        created_display = (
+            owner.created_at.strftime("%d/%m/%Y %H:%M") if owner.created_at else "-"
+        )
+
         owner_rows += f"""
         <tr>
             <td style="text-align: center; font-weight: 600;">#{owner.id}</td>
@@ -376,15 +390,15 @@ def list_owners_view(
             </td>
         </tr>
         """
-    
+
     # Controles de paginación
     pagination = ""
     if total_pages > 1:
-        prev_disabled = 'disabled' if page <= 1 else ''
-        next_disabled = 'disabled' if page >= total_pages else ''
+        prev_disabled = "disabled" if page <= 1 else ""
+        next_disabled = "disabled" if page >= total_pages else ""
         prev_page = max(1, page - 1)
         next_page = min(total_pages, page + 1)
-        
+
         pagination = f"""
         <div class="pagination">
             <a href="/owners/view?page={prev_page}&page_size={page_size}" class="btn-page" {prev_disabled}>← Anterior</a>
@@ -394,7 +408,7 @@ def list_owners_view(
         """
     else:
         pagination = f'<div class="pagination"><span class="page-info">Total: {total_count} dueños</span></div>'
-    
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -652,7 +666,7 @@ def list_owners_view(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -661,26 +675,26 @@ def search_owners_view(
     name: Optional[str] = Query(None),
     phone: Optional[str] = Query(None),
     email: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Vista HTML de búsqueda de dueños con filtros - Diseño profesional sin scroll."""
     # Construir query
     query = db.query(models.Owner)
-    
+
     # Filtrar por nombre
     if name:
         query = query.filter(models.Owner.name.ilike(f"%{name}%"))
-    
+
     # Filtrar por teléfono
     if phone:
         query = query.filter(models.Owner.phone.ilike(f"%{phone}%"))
-    
+
     # Filtrar por email
     if email:
         query = query.filter(models.Owner.email.ilike(f"%{email}%"))
-    
+
     owners = query.order_by(models.Owner.name.asc()).all()
-    
+
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -944,15 +958,19 @@ def search_owners_view(
         <!-- Grid de dueños -->
         <div class="owners-grid">
     """
-    
+
     if owners:
         for owner in owners:
-            phone_display = owner.phone if owner.phone is not None else 'No especificado'
-            email_display = owner.email if owner.email is not None else 'No especificado'
-            
+            phone_display = (
+                owner.phone if owner.phone is not None else "No especificado"
+            )
+            email_display = (
+                owner.email if owner.email is not None else "No especificado"
+            )
+
             # Obtener mascotas del dueño
             pets = owner.pets if owner.pets else []
-            
+
             # Construir lista de mascotas
             pets_html = ""
             if pets:
@@ -962,7 +980,7 @@ def search_owners_view(
                     pets_html += f'<p style="margin: 0.5rem 0 0; font-size: 0.8rem; opacity: 0.8;">... y {len(pets) - 3} más</p>'
             else:
                 pets_html = '<p style="margin: 0; opacity: 0.8; font-size: 0.85rem;">Sin mascotas registradas</p>'
-            
+
             html_content += f"""
           <div class="owner-card">
             <div class="owner-header">
@@ -998,14 +1016,14 @@ def search_owners_view(
             <p style="font-size: 1rem; color: #999;">Intenta ajustar los criterios de búsqueda.</p>
           </div>
         """
-    
+
     html_content += """
         </div>
       </div>
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1015,12 +1033,20 @@ def get_owner_view(owner_id: int, db: Session = Depends(get_db)):
     owner = db.get(models.Owner, owner_id)
     if not owner:
         raise HTTPException(status_code=404, detail="Owner not found")
-    
-    phone_display = owner.phone if owner.phone else '<span style="color: #999;">No especificado</span>'
-    email_display = owner.email if owner.email else '<span style="color: #999;">No especificado</span>'
-    
+
+    phone_display = (
+        owner.phone
+        if owner.phone
+        else '<span style="color: #999;">No especificado</span>'
+    )
+    email_display = (
+        owner.email
+        if owner.email
+        else '<span style="color: #999;">No especificado</span>'
+    )
+
     pets = owner.pets if owner.pets else []
-    
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -1298,13 +1324,15 @@ def get_owner_view(owner_id: int, db: Session = Depends(get_db)):
           <div class="section">
             <h2 class="section-title">🐾 Mascotas</h2>
     """
-    
+
     if pets:
         html_content += '<div class="pets-grid">'
         for pet in pets:
-            breed_display = pet.breed if pet.breed else 'No especificado'
-            age_display = f"{pet.age} años" if pet.age is not None else 'No especificado'
-            
+            breed_display = pet.breed if pet.breed else "No especificado"
+            age_display = (
+                f"{pet.age} años" if pet.age is not None else "No especificado"
+            )
+
             html_content += f"""
             <div class="pet-card">
               <div class="pet-header">
@@ -1336,7 +1364,7 @@ def get_owner_view(owner_id: int, db: Session = Depends(get_db)):
               </div>
             </div>
             """
-        html_content += '</div>'
+        html_content += "</div>"
     else:
         html_content += """
           <div class="no-pets">
@@ -1345,7 +1373,7 @@ def get_owner_view(owner_id: int, db: Session = Depends(get_db)):
             <p style="color: #999; margin: 0.5rem 0 0;">Puedes agregar mascotas desde el panel de administración</p>
           </div>
         """
-    
+
     html_content += f"""
           </div>
           
@@ -1362,8 +1390,9 @@ def get_owner_view(owner_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
+
 
 @router.get("/{owner_id}/edit", response_class=HTMLResponse)
 def edit_owner_form(owner_id: int, db: Session = Depends(get_db)):
@@ -1371,7 +1400,7 @@ def edit_owner_form(owner_id: int, db: Session = Depends(get_db)):
     owner = db.get(models.Owner, owner_id)
     if not owner:
         raise HTTPException(status_code=404, detail="Owner not found")
-    
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -1525,7 +1554,7 @@ def edit_owner_form(owner_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1541,19 +1570,23 @@ def update_owner(
     owner = db.get(models.Owner, owner_id)
     if not owner:
         raise HTTPException(status_code=404, detail="Owner not found")
-    
+
     # Actualizar campos
     owner.name = name
     owner.phone = phone if phone else None
     owner.email = email if email else None
-    
+
     db.commit()
     db.refresh(owner)
-    
+
     # Página de confirmación
-    phone_display = phone if phone else '<span style="color: #999;">No especificado</span>'
-    email_display = email if email else '<span style="color: #999;">No especificado</span>'
-    
+    phone_display = (
+        phone if phone else '<span style="color: #999;">No especificado</span>'
+    )
+    email_display = (
+        email if email else '<span style="color: #999;">No especificado</span>'
+    )
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -1730,7 +1763,7 @@ def update_owner(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1740,18 +1773,18 @@ def delete_owner(owner_id: int, db: Session = Depends(get_db)):
     owner = db.get(models.Owner, owner_id)
     if not owner:
         raise HTTPException(status_code=404, detail="Owner not found")
-    
+
     # Contar registros relacionados
     pets_count = len(owner.pets) if owner.pets else 0
-    
+
     # Guardar info antes de eliminar
     owner_name = owner.name
     owner_id_saved = owner.id
-    
+
     # Eliminar (cascade eliminará mascotas, turnos, etc.)
     db.delete(owner)
     db.commit()
-    
+
     # Página de confirmación
     html_content = f"""
     <!doctype html>
@@ -1897,7 +1930,7 @@ def delete_owner(owner_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 

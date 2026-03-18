@@ -3,15 +3,15 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class PetBase(BaseModel):
-    name: str = Field(..., example="Firulais")
-    species: str = Field(..., example="perro")
-    breed: str | None = Field(None, example="mestizo")
-    birth_date: date | None = Field(None, example="2020-05-01")
-    notes: str | None = Field(None, example="vacunas al día")
+    name: str = Field(..., json_schema_extra={"example": "Firulais"})
+    species: str = Field(..., json_schema_extra={"example": "perro"})
+    breed: str | None = Field(None, json_schema_extra={"example": "mestizo"})
+    birth_date: date | None = Field(None, json_schema_extra={"example": "2020-05-01"})
+    notes: str | None = Field(None, json_schema_extra={"example": "vacunas al día"})
 
 
 class PetCreate(PetBase):
-    owner_id: int = Field(..., example=1)
+    owner_id: int = Field(..., json_schema_extra={"example": 1})
     model_config = ConfigDict(
         json_schema_extra={
             "example": {

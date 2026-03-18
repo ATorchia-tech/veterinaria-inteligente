@@ -3,14 +3,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ClinicalRecordBase(BaseModel):
-    symptoms: str | None = Field(None, example="tos, decaimiento")
-    diagnosis: str | None = Field(None, example="resfriado leve")
-    treatment: str | None = Field(None, example="reposo, hidratación")
-    medications: str | None = Field(None, example="vitaminas")
+    symptoms: str | None = Field(
+        None, json_schema_extra={"example": "tos, decaimiento"}
+    )
+    diagnosis: str | None = Field(None, json_schema_extra={"example": "resfriado leve"})
+    treatment: str | None = Field(
+        None, json_schema_extra={"example": "reposo, hidratación"}
+    )
+    medications: str | None = Field(None, json_schema_extra={"example": "vitaminas"})
 
 
 class ClinicalRecordCreate(ClinicalRecordBase):
-    pet_id: int = Field(..., example=1)
+    pet_id: int = Field(..., json_schema_extra={"example": 1})
     model_config = ConfigDict(
         json_schema_extra={
             "example": {

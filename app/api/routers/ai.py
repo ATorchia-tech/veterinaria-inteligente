@@ -50,7 +50,7 @@ def predict(day: date | None = None):
     """
     # Si no se proporciona día, usar el día actual
     target_day = day if day else date.today()
-    
+
     # Obtener features de clima + fecha
     f = get_weather_features(target_day)
     label, prob = predict_affluence(f)

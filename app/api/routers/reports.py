@@ -18,7 +18,8 @@ def attendance_report(
     start_dt = datetime(start.year, start.month, start.day)
     end_dt = datetime(end.year, end.month, end.day, 23, 59, 59)
     total = db.query(models.Appointment).filter(
-        models.Appointment.date >= start_dt, models.Appointment.date <= end_dt
+        models.Appointment.appointment_date >= start_dt,
+        models.Appointment.appointment_date <= end_dt,
     )
     attended = total.filter(models.Appointment.status == "attended").count()
     canceled = total.filter(models.Appointment.status == "canceled").count()

@@ -57,7 +57,9 @@ class Pet(Base):
 class ClinicalRecord(Base):
     __tablename__ = "clinical_records"
     id = Column(Integer, primary_key=True, index=True)
-    visit_date = Column(Date, nullable=False, default=lambda: datetime.now(timezone.utc).date())
+    visit_date = Column(
+        Date, nullable=False, default=lambda: datetime.now(timezone.utc).date()
+    )
     # Use timezone-aware timestamps to avoid deprecation warnings and ensure UTC storage
     created_at = Column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

@@ -262,7 +262,7 @@ HTML_PAGE = """
   <!-- Encabezado fijo -->
   <div class="top-header">
     <div class="team-info">IFTS-12, A.Mercado, S.Paniagua, F.Hernández, A.Torchia</div>
-    <a href="http://127.0.0.1:8000/" class="btn-home">🏠 Ir a Inicio</a>
+    <a href="/" class="btn-home">🏠 Ir a Inicio</a>
   </div>
   
   <div class="content-wrapper">

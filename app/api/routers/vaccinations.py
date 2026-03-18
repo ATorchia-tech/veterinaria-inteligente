@@ -79,20 +79,24 @@ def view_vaccinations(
     pet_id: Optional[int] = Query(None),
     type: Optional[str] = Query(None),
     days: int = Query(30, ge=1, le=365),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Vista HTML de vacunas próximas o vencidas."""
     today = date.today()
-    
+
     # Si se especifica pet_id, mostrar todas las vacunas de esa mascota
     if pet_id is not None:
         pet = db.get(models.Pet, pet_id)
         if not pet:
             raise HTTPException(status_code=404, detail="Pet not found")
-        
+
         # Obtener emoji de la especie
-        species_emoji = "🐕" if pet.species.lower() == "perro" else "🐈" if pet.species.lower() == "gato" else "🐾"
-        
+        species_emoji = (
+            "🐕"
+            if pet.species.lower() == "perro"
+            else "🐈" if pet.species.lower() == "gato" else "🐾"
+        )
+
         # Todas las vacunas del pet
         vaccinations = (
             db.query(models.Vaccination)
@@ -106,7 +110,7 @@ def view_vaccinations(
         color = "#667eea"
         is_overdue = False  # No aplica cuando vemos todas las vacunas
         list_label = "registradas"
-    
+
     # Determinar tipo de vista
     elif type == "overdue":
         # Vacunas vencidas (due_date < hoy)
@@ -129,7 +133,7 @@ def view_vaccinations(
             db.query(models.Vaccination)
             .filter(
                 models.Vaccination.due_date >= today,
-                models.Vaccination.due_date <= limit
+                models.Vaccination.due_date <= limit,
             )
             .order_by(models.Vaccination.due_date.asc())
             .all()
@@ -140,7 +144,7 @@ def view_vaccinations(
         color = "#ff9800"
         is_overdue = False
         list_label = "próximas a vencer"
-    
+
     # Calcular urgencia
     def get_urgency(vac):
         delta = (vac.due_date - today).days
@@ -152,7 +156,7 @@ def view_vaccinations(
             return "warning", delta
         else:
             return "normal", delta
-    
+
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -368,37 +372,37 @@ def view_vaccinations(
         
         <div class="vaccinations-grid">
     """
-    
+
     if vaccinations:
         for vac in vaccinations:
             urgency_type, days_diff = get_urgency(vac)
-            
+
             urgency_text = {
-                'overdue': f'VENCIDA hace {days_diff} días',
-                'urgent': f'Vence en {days_diff} días',
-                'warning': f'Vence en {days_diff} días',
-                'normal': f'Vence en {days_diff} días'
-            }.get(urgency_type, '')
-            
-            due_date_str = vac.due_date.strftime('%d/%m/%Y')
-            applied_date_str = 'N/A'
+                "overdue": f"VENCIDA hace {days_diff} días",
+                "urgent": f"Vence en {days_diff} días",
+                "warning": f"Vence en {days_diff} días",
+                "normal": f"Vence en {days_diff} días",
+            }.get(urgency_type, "")
+
+            due_date_str = vac.due_date.strftime("%d/%m/%Y")
+            applied_date_str = "N/A"
             if vac.applied_date is not None:
-                applied_date_str = vac.applied_date.strftime('%d/%m/%Y')
-            
-            pet_name = vac.pet.name if vac.pet else 'N/A'
-            pet_species = vac.pet.species if vac.pet else 'N/A'
-            pet_breed = vac.pet.breed if vac.pet else 'N/A'
-            
+                applied_date_str = vac.applied_date.strftime("%d/%m/%Y")
+
+            pet_name = vac.pet.name if vac.pet else "N/A"
+            pet_species = vac.pet.species if vac.pet else "N/A"
+            pet_breed = vac.pet.breed if vac.pet else "N/A"
+
             # Nombre del dueño
             if vac.pet and vac.pet.owner:
                 owner_name = vac.pet.owner.name
-                owner_phone = vac.pet.owner.phone if vac.pet.owner.phone else 'N/A'
-                owner_email = vac.pet.owner.email if vac.pet.owner.email else 'N/A'
+                owner_phone = vac.pet.owner.phone if vac.pet.owner.phone else "N/A"
+                owner_email = vac.pet.owner.email if vac.pet.owner.email else "N/A"
             else:
-                owner_name = 'N/A'
-                owner_phone = 'N/A'
-                owner_email = 'N/A'
-            
+                owner_name = "N/A"
+                owner_phone = "N/A"
+                owner_email = "N/A"
+
             html_content += f"""
           <div class="vaccination-card {urgency_type}">
             <div class="vaccination-header">
@@ -450,14 +454,14 @@ def view_vaccinations(
         else:
             no_vac_icon = "😌"
             no_vac_msg = "No hay vacunas próximas a vencer en este período."
-        
+
         html_content += f"""
           <div class="no-vaccinations">
             <div class="no-vaccinations-icon">{no_vac_icon}</div>
             <p>{no_vac_msg}</p>
           </div>
         """
-    
+
     html_content += """
         </div>
         
@@ -468,6 +472,5 @@ def view_vaccinations(
     </body>
     </html>
     """
-    
-    return html_content
 
+    return html_content

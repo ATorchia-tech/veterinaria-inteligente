@@ -10,7 +10,9 @@ from app.db.database import Base, engine, SessionLocal
 from app.db import models
 
 
-def _get_or_create_owner(db: Session, name: str, email: str, phone: str) -> models.Owner:
+def _get_or_create_owner(
+    db: Session, name: str, email: str, phone: str
+) -> models.Owner:
     owner = db.query(models.Owner).filter(models.Owner.email == email).first()
     if owner:
         return owner
@@ -56,7 +58,9 @@ def _get_or_create_appointment(
     )
     if ap:
         return ap
-    ap = models.Appointment(pet_id=pet_id, appointment_date=date, reason=reason, status=status)
+    ap = models.Appointment(
+        pet_id=pet_id, appointment_date=date, reason=reason, status=status
+    )
     db.add(ap)
     db.commit()
     db.refresh(ap)
@@ -78,11 +82,11 @@ def _get_or_create_vaccination(
     if vacc:
         return vacc
     vacc = models.Vaccination(
-        pet_id=pet_id, 
-        vaccine_name=vaccine_name, 
+        pet_id=pet_id,
+        vaccine_name=vaccine_name,
         applied_date=applied_date,
-        due_date=due_date, 
-        status="upcoming"
+        due_date=due_date,
+        status="upcoming",
     )
     db.add(vacc)
     db.commit()
@@ -121,17 +125,21 @@ def seed():
 
         today10 = datetime.now().replace(hour=10, minute=0, second=0, microsecond=0)
         _get_or_create_appointment(
-            db, pet_id=cast(int, pet.id), date=today10, reason="vacunación", status="scheduled"
+            db,
+            pet_id=cast(int, pet.id),
+            date=today10,
+            reason="vacunación",
+            status="scheduled",
         )
 
         applied = (today10 - timedelta(days=365)).date()  # Aplicada hace 1 año
         due = (today10 + timedelta(days=14)).date()
         _get_or_create_vaccination(
-            db, 
-            pet_id=cast(int, pet.id), 
-            vaccine_name="Rabia", 
+            db,
+            pet_id=cast(int, pet.id),
+            vaccine_name="Rabia",
             applied_date=applied,
-            due_date=due
+            due_date=due,
         )
 
         print(
@@ -163,12 +171,18 @@ def seed_bulk(min_count: int = 200):
             species = "perro" if i % 2 == 0 else "gato"
             breed = "mestizo" if species == "perro" else "siamés"
             pet = _get_or_create_pet(
-                db, owner_id=cast(int, owner.id), name=pet_name, species=species, breed=breed
+                db,
+                owner_id=cast(int, owner.id),
+                name=pet_name,
+                species=species,
+                breed=breed,
             )
 
             ap_dt = base_dt + timedelta(minutes=i)
             reason = f"control {i:03d}"
-            _get_or_create_appointment(db, pet_id=cast(int, pet.id), date=ap_dt, reason=reason)
+            _get_or_create_appointment(
+                db, pet_id=cast(int, pet.id), date=ap_dt, reason=reason
+            )
 
         print(
             f"Seed bulk idempotente: asegurados >= {min_count} owners/pets/appointments"
@@ -218,8 +232,18 @@ def _fetch_dog_breeds_from_wiki(max_items: int = 200) -> list[str]:
         names = _extract_anchor_texts(section)
         # Heuristic filters: remove obviously non-breed terms and duplicates
         bad_substrings = [
-            "Edit", "Talk", "Read", "View", "Template", "Help:", "Category:",
-            "List of", "Most popular", "Portal", "Dog type", "Breed",
+            "Edit",
+            "Talk",
+            "Read",
+            "View",
+            "Template",
+            "Help:",
+            "Category:",
+            "List of",
+            "Most popular",
+            "Portal",
+            "Dog type",
+            "Breed",
         ]
         out: list[str] = []
         seen = set()
@@ -264,8 +288,18 @@ def _fetch_cat_breeds_from_wiki(max_items: int = 200) -> list[str]:
         section = m.group(0) if m else html
         names = _extract_anchor_texts(section)
         bad_words = [
-            "Edit", "Talk", "Read", "View", "Template", "Help:", "Category:",
-            "List of", "Portal", "Cat family", "Felidae", "Oriental Longhair",
+            "Edit",
+            "Talk",
+            "Read",
+            "View",
+            "Template",
+            "Help:",
+            "Category:",
+            "List of",
+            "Portal",
+            "Cat family",
+            "Felidae",
+            "Oriental Longhair",
         ]
         out: list[str] = []
         seen = set()
@@ -302,8 +336,16 @@ def _fetch_cat_breeds_from_wiki(max_items: int = 200) -> list[str]:
             pass
         # Fallback minimal
         return [
-            "Siamese", "Persian", "Maine Coon", "Ragdoll", "Bengal",
-            "Sphynx", "British Shorthair", "Abyssinian", "Scottish Fold", "Russian Blue",
+            "Siamese",
+            "Persian",
+            "Maine Coon",
+            "Ragdoll",
+            "Bengal",
+            "Sphynx",
+            "British Shorthair",
+            "Abyssinian",
+            "Scottish Fold",
+            "Russian Blue",
         ]
 
 
@@ -328,11 +370,29 @@ def seed_internet(count: int = 100):
         cat_breeds = _fetch_cat_breeds_from_wiki(300)
 
         pet_names = [
-            "Luna", "Max", "Bella", "Charlie", "Milo", "Nala", "Rocky", "Coco",
-            "Simba", "Lola", "Toby", "Mia", "Lucy", "Leo", "Kira", "Bruno",
+            "Luna",
+            "Max",
+            "Bella",
+            "Charlie",
+            "Milo",
+            "Nala",
+            "Rocky",
+            "Coco",
+            "Simba",
+            "Lola",
+            "Toby",
+            "Mia",
+            "Lucy",
+            "Leo",
+            "Kira",
+            "Bruno",
         ]
         reasons = [
-            "control", "vacunación", "chequeo", "desparasitación", "consulta",
+            "control",
+            "vacunación",
+            "chequeo",
+            "desparasitación",
+            "consulta",
         ]
 
         base_dt = datetime.now().replace(hour=11, minute=0, second=0, microsecond=0)
@@ -344,7 +404,9 @@ def seed_internet(count: int = 100):
 
             species = "perro" if i % 2 == 1 else "gato"
             breed = (
-                random.choice(dog_breeds) if species == "perro" else random.choice(cat_breeds)
+                random.choice(dog_breeds)
+                if species == "perro"
+                else random.choice(cat_breeds)
             )
             pet_name = f"{random.choice(pet_names)}{i:02d}"
             pet = _get_or_create_pet(
@@ -377,12 +439,12 @@ def seed_today_appointments(count: int = 10):
         if owners_count == 0:
             print("No hay dueños en la base. Ejecutando seed base primero...")
             seed()
-        
+
         pets = db.query(models.Pet).all()
         if not pets:
             print("No hay mascotas en la base. No se pueden crear turnos.")
             return
-        
+
         today = datetime.now().date()
         estados = ["scheduled", "attended", "canceled"]
         motivos = [
@@ -397,41 +459,37 @@ def seed_today_appointments(count: int = 10):
             "castración",
             "tratamiento dental",
         ]
-        
+
         # Generar turnos distribuidos en horario laboral (9:00 - 18:00)
         horarios_base = [9, 10, 11, 12, 14, 15, 16, 17]
-        
+
         random.seed(42)  # Para reproducibilidad
-        
+
         turnos_creados = 0
         for i in range(count):
             pet = random.choice(pets)
             hora = random.choice(horarios_base)
             minuto = random.choice([0, 15, 30, 45])
-            
-            date_time = datetime.combine(
-                today, datetime.min.time()
-            ).replace(hour=hora, minute=minuto)
-            
+
+            date_time = datetime.combine(today, datetime.min.time()).replace(
+                hour=hora, minute=minuto
+            )
+
             # Asignar estado según el horario
             # Turnos pasados: mayormente atendidos o cancelados
             # Turnos futuros: scheduled
             now = datetime.now()
             if date_time < now:
                 estado = random.choices(
-                    estados,
-                    weights=[10, 70, 20],  # scheduled, attended, canceled
-                    k=1
+                    estados, weights=[10, 70, 20], k=1  # scheduled, attended, canceled
                 )[0]
             else:
                 estado = random.choices(
-                    estados,
-                    weights=[85, 5, 10],  # scheduled, attended, canceled
-                    k=1
+                    estados, weights=[85, 5, 10], k=1  # scheduled, attended, canceled
                 )[0]
-            
+
             motivo = random.choice(motivos)
-            
+
             _get_or_create_appointment(
                 db,
                 pet_id=cast(int, pet.id),
@@ -440,7 +498,7 @@ def seed_today_appointments(count: int = 10):
                 status=estado,
             )
             turnos_creados += 1
-        
+
         print(
             f"Seed today appointments: cargados {turnos_creados} turnos para hoy ({today})."
         )
@@ -457,15 +515,15 @@ def seed_two_months_appointments(count_per_day: int = 8):
         if owners_count == 0:
             print("No hay dueños en la base. Ejecutando seed base primero...")
             seed()
-        
+
         pets = db.query(models.Pet).all()
         if not pets:
             print("No hay mascotas en la base. No se pueden crear turnos.")
             return
-        
+
         today = datetime.now().date()
         end_date = today + timedelta(days=60)  # 2 meses
-        
+
         estados = ["scheduled", "attended", "canceled"]
         motivos = [
             "control anual",
@@ -484,15 +542,15 @@ def seed_two_months_appointments(count_per_day: int = 8):
             "cirugía menor",
             "control de peso",
         ]
-        
+
         # Horarios laborales
         horarios_base = [9, 10, 11, 12, 14, 15, 16, 17]
-        
+
         random.seed(42)  # Para reproducibilidad
-        
+
         turnos_creados = 0
         current_date = today
-        
+
         while current_date <= end_date:
             # Solo días laborales (lunes a viernes)
             if current_date.weekday() < 5:  # 0=lunes, 4=viernes
@@ -500,11 +558,11 @@ def seed_two_months_appointments(count_per_day: int = 8):
                     pet = random.choice(pets)
                     hora = random.choice(horarios_base)
                     minuto = random.choice([0, 15, 30, 45])
-                    
+
                     date_time = datetime.combine(
                         current_date, datetime.min.time()
                     ).replace(hour=hora, minute=minuto)
-                    
+
                     # Asignar estado según la fecha
                     now = datetime.now()
                     if date_time < now:
@@ -512,18 +570,18 @@ def seed_two_months_appointments(count_per_day: int = 8):
                         estado = random.choices(
                             estados,
                             weights=[5, 80, 15],  # scheduled, attended, canceled
-                            k=1
+                            k=1,
                         )[0]
                     else:
                         # Turnos futuros: principalmente scheduled
                         estado = random.choices(
                             estados,
                             weights=[90, 5, 5],  # scheduled, attended, canceled
-                            k=1
+                            k=1,
                         )[0]
-                    
+
                     motivo = random.choice(motivos)
-                    
+
                     _get_or_create_appointment(
                         db,
                         pet_id=cast(int, pet.id),
@@ -532,9 +590,9 @@ def seed_two_months_appointments(count_per_day: int = 8):
                         status=estado,
                     )
                     turnos_creados += 1
-            
+
             current_date += timedelta(days=1)
-        
+
         print(
             f"Seed two months: cargados {turnos_creados} turnos desde {today} hasta {end_date}."
         )
@@ -551,13 +609,13 @@ def seed_vaccinations_samples(count: int = 50):
             print("No hay mascotas en la base. Ejecutando seed base primero...")
             seed()
             pets = db.query(models.Pet).all()
-        
+
         if not pets:
             print("No se pueden crear vacunas sin mascotas.")
             return
-        
+
         today = datetime.now().date()
-        
+
         vaccines = [
             "Rabia",
             "Séxtuple (Parvovirus, Moquillo, Hepatitis, Leptospirosis, Parainfluenza, Coronavirus)",
@@ -570,21 +628,21 @@ def seed_vaccinations_samples(count: int = 50):
             "Leucemia Felina",
             "Giardia",
         ]
-        
+
         random.seed(42)
-        
+
         vacunas_creadas = 0
-        
+
         # Distribuir vacunas en diferentes rangos de tiempo
         # 20% vencidas (hace 1-60 días)
         # 30% próximas urgentes (1-7 días)
         # 30% próximas advertencia (8-30 días)
         # 20% futuras (31-90 días)
-        
+
         for i in range(count):
             pet = random.choice(pets)
             vaccine_name = random.choice(vaccines)
-            
+
             # Determinar rango de fecha
             rand = random.random()
             if rand < 0.2:
@@ -599,14 +657,14 @@ def seed_vaccinations_samples(count: int = 50):
             else:
                 # Futuras (31-90 días)
                 days_offset = random.randint(31, 90)
-            
+
             due_date = today + timedelta(days=days_offset)
-            
+
             # Fecha de aplicación (aprox 1 año antes del vencimiento)
             applied_date = due_date - timedelta(days=365)
-            
+
             status = "overdue" if days_offset < 0 else "due"
-            
+
             # Verificar si ya existe
             exists = (
                 db.query(models.Vaccination)
@@ -617,7 +675,7 @@ def seed_vaccinations_samples(count: int = 50):
                 )
                 .first()
             )
-            
+
             if not exists:
                 vac = models.Vaccination(
                     pet_id=cast(int, pet.id),
@@ -628,11 +686,9 @@ def seed_vaccinations_samples(count: int = 50):
                 )
                 db.add(vac)
                 vacunas_creadas += 1
-        
+
         db.commit()
-        print(
-            f"Seed vaccinations: cargadas {vacunas_creadas} vacunas de muestra."
-        )
+        print(f"Seed vaccinations: cargadas {vacunas_creadas} vacunas de muestra.")
     finally:
         db.close()
 
@@ -646,13 +702,13 @@ def seed_clinical_records_samples(count: int = 30):
             print("No hay mascotas en la base. Ejecutando seed base primero...")
             seed()
             pets = db.query(models.Pet).all()
-        
+
         if not pets:
             print("No se pueden crear récords sin mascotas.")
             return
-        
+
         today = datetime.now().date()
-        
+
         symptoms_list = [
             "Tos persistente",
             "Vómitos",
@@ -665,7 +721,7 @@ def seed_clinical_records_samples(count: int = 30):
             "Pérdida de peso",
             "Dificultad para respirar",
         ]
-        
+
         diagnoses_list = [
             "Infección respiratoria leve",
             "Gastroenteritis",
@@ -678,7 +734,7 @@ def seed_clinical_records_samples(count: int = 30):
             "Control de rutina - sano",
             "Reacción alérgica leve",
         ]
-        
+
         treatments_list = [
             "Reposo y observación",
             "Dieta blanda por 3 días",
@@ -691,7 +747,7 @@ def seed_clinical_records_samples(count: int = 30):
             "Hidratación",
             "Analgésicos",
         ]
-        
+
         medications_list = [
             "Amoxicilina 250mg cada 12hs por 7 días",
             "Carprofeno 50mg cada 24hs por 5 días",
@@ -700,23 +756,23 @@ def seed_clinical_records_samples(count: int = 30):
             "Omeprazol 20mg cada 24hs por 10 días",
             None,  # Sin medicamentos
         ]
-        
+
         random.seed(42)
-        
+
         records_creados = 0
-        
+
         for i in range(count):
             pet = random.choice(pets)
-            
+
             # Fecha de visita entre hace 6 meses y hoy
             days_ago = random.randint(0, 180)
             visit_date = today - timedelta(days=days_ago)
-            
+
             symptoms = random.choice(symptoms_list)
             diagnosis = random.choice(diagnoses_list)
             treatment = random.choice(treatments_list)
             medications = random.choice(medications_list)
-            
+
             # Verificar si ya existe un record similar
             exists = (
                 db.query(models.ClinicalRecord)
@@ -727,7 +783,7 @@ def seed_clinical_records_samples(count: int = 30):
                 )
                 .first()
             )
-            
+
             if not exists:
                 record = models.ClinicalRecord(
                     pet_id=cast(int, pet.id),
@@ -739,7 +795,7 @@ def seed_clinical_records_samples(count: int = 30):
                 )
                 db.add(record)
                 records_creados += 1
-        
+
         db.commit()
         print(
             f"Seed clinical records: cargados {records_creados} récords clínicos de muestra."

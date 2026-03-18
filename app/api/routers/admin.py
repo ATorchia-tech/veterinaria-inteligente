@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
-import os
 from pathlib import Path
 
 from app.db.database import Base, engine, get_db
@@ -39,17 +38,29 @@ def db_counts(db: Session = Depends(get_db)):
 
 @router.get("/admin/db_counts_form", response_class=HTMLResponse, tags=["admin"])
 def db_counts_form(db: Session = Depends(get_db)):
-        """Página amigable que muestra totales del sistema."""
-        owners = db.query(models.Owner).count()
-        pets = db.query(models.Pet).count()
-        appts = db.query(models.Appointment).count()
-        appts_scheduled = db.query(models.Appointment).filter(models.Appointment.status == "scheduled").count()
-        appts_attended = db.query(models.Appointment).filter(models.Appointment.status == "attended").count()
-        appts_canceled = db.query(models.Appointment).filter(models.Appointment.status == "canceled").count()
-        vaccs = db.query(models.Vaccination).count()
-        records = db.query(models.ClinicalRecord).count()
+    """Página amigable que muestra totales del sistema."""
+    owners = db.query(models.Owner).count()
+    pets = db.query(models.Pet).count()
+    appts = db.query(models.Appointment).count()
+    appts_scheduled = (
+        db.query(models.Appointment)
+        .filter(models.Appointment.status == "scheduled")
+        .count()
+    )
+    appts_attended = (
+        db.query(models.Appointment)
+        .filter(models.Appointment.status == "attended")
+        .count()
+    )
+    appts_canceled = (
+        db.query(models.Appointment)
+        .filter(models.Appointment.status == "canceled")
+        .count()
+    )
+    vaccs = db.query(models.Vaccination).count()
+    records = db.query(models.ClinicalRecord).count()
 
-        html = f"""
+    html = f"""
         <!doctype html>
         <html lang="es">
         <head>
@@ -359,46 +370,47 @@ def db_counts_form(db: Session = Depends(get_db)):
         </html>
         """
 
-        return HTMLResponse(content=html)
+    return HTMLResponse(content=html)
+
 
 @router.get("/admin/db_details", response_class=HTMLResponse, tags=["admin"])
 def db_details(limit: int = 10, db: Session = Depends(get_db)):
-        """Página amigable que muestra los últimos registros de cada tabla."""
-        limit = max(1, min(limit, 50))  # seguridad básica, máx 50 para no sobrecargar
+    """Página amigable que muestra los últimos registros de cada tabla."""
+    limit = max(1, min(limit, 50))  # seguridad básica, máx 50 para no sobrecargar
 
-        owners = (
-                db.query(models.Owner).order_by(models.Owner.id.desc()).limit(limit).all()
-        )
-        pets = (
-                db.query(models.Pet).order_by(models.Pet.id.desc()).limit(limit).all()
-        )
-        appts = (
-                db.query(models.Appointment)
-                .order_by(models.Appointment.id.desc())
-                .limit(limit)
-                .all()
-        )
-        vaccs = (
-                db.query(models.Vaccination)
-                .order_by(models.Vaccination.id.desc())
-                .limit(limit)
-                .all()
-        )
+    owners = db.query(models.Owner).order_by(models.Owner.id.desc()).limit(limit).all()
+    pets = db.query(models.Pet).order_by(models.Pet.id.desc()).limit(limit).all()
+    appts = (
+        db.query(models.Appointment)
+        .order_by(models.Appointment.id.desc())
+        .limit(limit)
+        .all()
+    )
+    vaccs = (
+        db.query(models.Vaccination)
+        .order_by(models.Vaccination.id.desc())
+        .limit(limit)
+        .all()
+    )
 
-        def safe(v):
-                return "" if v is None else str(v)
-        
-        def format_date(dt):
-                if dt is None:
-                        return ""
-                if hasattr(dt, 'strftime'):
-                        return dt.strftime('%d/%m/%Y %H:%M') if hasattr(dt, 'hour') else dt.strftime('%d/%m/%Y')
-                return str(dt)
+    def safe(v):
+        return "" if v is None else str(v)
 
-        # Generar filas de dueños
-        owners_rows = ""
-        for owner in owners:
-                owners_rows += f"""
+    def format_date(dt):
+        if dt is None:
+            return ""
+        if hasattr(dt, "strftime"):
+            return (
+                dt.strftime("%d/%m/%Y %H:%M")
+                if hasattr(dt, "hour")
+                else dt.strftime("%d/%m/%Y")
+            )
+        return str(dt)
+
+    # Generar filas de dueños
+    owners_rows = ""
+    for owner in owners:
+        owners_rows += f"""
                 <tr>
                     <td><strong>#{owner.id}</strong></td>
                     <td>{safe(owner.name)}</td>
@@ -411,20 +423,20 @@ def db_details(limit: int = 10, db: Session = Depends(get_db)):
                     </td>
                 </tr>
                 """
-        
-        # Generar filas de mascotas
-        pets_rows = ""
-        species_emoji_map = {
-            'perro': '🐕',
-            'gato': '🐈',
-            'ave': '🦜',
-            'conejo': '🐰',
-            'hamster': '🐹',
-        }
-        for pet in pets:
-                species_emoji = species_emoji_map.get(safe(pet.species).lower(), '🐾')
-                owner_name = pet.owner.name if pet.owner else 'N/A'
-                pets_rows += f"""
+
+    # Generar filas de mascotas
+    pets_rows = ""
+    species_emoji_map = {
+        "perro": "🐕",
+        "gato": "🐈",
+        "ave": "🦜",
+        "conejo": "🐰",
+        "hamster": "🐹",
+    }
+    for pet in pets:
+        species_emoji = species_emoji_map.get(safe(pet.species).lower(), "🐾")
+        owner_name = pet.owner.name if pet.owner else "N/A"
+        pets_rows += f"""
                 <tr>
                     <td><strong>#{pet.id}</strong></td>
                     <td>{species_emoji} {safe(pet.name)}</td>
@@ -438,25 +450,27 @@ def db_details(limit: int = 10, db: Session = Depends(get_db)):
                     </td>
                 </tr>
                 """
-        
-        # Generar filas de turnos
-        appts_rows = ""
-        status_map = {
-            'scheduled': {'text': 'Programado', 'color': '#28a745', 'icon': '📅'},
-            'attended': {'text': 'Atendido', 'color': '#007bff', 'icon': '✅'},
-            'canceled': {'text': 'Cancelado', 'color': '#dc3545', 'icon': '❌'}
-        }
-        for apt in appts:
-                apt_status = str(apt.status) if apt.status else 'scheduled'  # type: ignore
-                status_info = status_map.get(apt_status, {'text': apt_status, 'color': '#6c757d', 'icon': '📋'})
-                pet_name = apt.pet.name if apt.pet else 'N/A'
-                
-                # Agregar botón de cancelar solo si el turno está programado
-                cancel_button = ""
-                if apt_status == 'scheduled':
-                    cancel_button = f'<a href="/appointments/{apt.id}/cancel-form" target="_blank" class="btn-mini btn-cancel" onclick="return confirm(\'¿Deseas cancelar este turno? Esta acción quedará registrada en el historial.\')">❌ Cancelar</a>'
-                
-                appts_rows += f"""
+
+    # Generar filas de turnos
+    appts_rows = ""
+    status_map = {
+        "scheduled": {"text": "Programado", "color": "#28a745", "icon": "📅"},
+        "attended": {"text": "Atendido", "color": "#007bff", "icon": "✅"},
+        "canceled": {"text": "Cancelado", "color": "#dc3545", "icon": "❌"},
+    }
+    for apt in appts:
+        apt_status = str(apt.status) if apt.status else "scheduled"  # type: ignore
+        status_info = status_map.get(
+            apt_status, {"text": apt_status, "color": "#6c757d", "icon": "📋"}
+        )
+        pet_name = apt.pet.name if apt.pet else "N/A"
+
+        # Agregar botón de cancelar solo si el turno está programado
+        cancel_button = ""
+        if apt_status == "scheduled":
+            cancel_button = f'<a href="/appointments/{apt.id}/cancel-form" target="_blank" class="btn-mini btn-cancel" onclick="return confirm(\'¿Deseas cancelar este turno? Esta acción quedará registrada en el historial.\')">❌ Cancelar</a>'
+
+        appts_rows += f"""
                 <tr>
                     <td><strong>#{apt.id}</strong></td>
                     <td>{format_date(apt.appointment_date)}</td>
@@ -473,20 +487,22 @@ def db_details(limit: int = 10, db: Session = Depends(get_db)):
                     </td>
                 </tr>
                 """
-        
-        # Generar filas de vacunaciones
-        vaccs_rows = ""
-        vacc_status_map = {
-            'due': {'text': 'Pendiente', 'color': '#ffc107', 'icon': '⏳'},
-            'done': {'text': 'Aplicada', 'color': '#28a745', 'icon': '✅'},
-            'overdue': {'text': 'Vencida', 'color': '#dc3545', 'icon': '⚠️'},
-            'upcoming': {'text': 'Próxima', 'color': '#17a2b8', 'icon': '📅'}
-        }
-        for vacc in vaccs:
-                pet_name = vacc.pet.name if vacc.pet else 'N/A'
-                vacc_status = str(vacc.status) if vacc.status else 'due'  # type: ignore
-                status_info = vacc_status_map.get(vacc_status, {'text': vacc_status, 'color': '#6c757d', 'icon': '💉'})
-                vaccs_rows += f"""
+
+    # Generar filas de vacunaciones
+    vaccs_rows = ""
+    vacc_status_map = {
+        "due": {"text": "Pendiente", "color": "#ffc107", "icon": "⏳"},
+        "done": {"text": "Aplicada", "color": "#28a745", "icon": "✅"},
+        "overdue": {"text": "Vencida", "color": "#dc3545", "icon": "⚠️"},
+        "upcoming": {"text": "Próxima", "color": "#17a2b8", "icon": "📅"},
+    }
+    for vacc in vaccs:
+        pet_name = vacc.pet.name if vacc.pet else "N/A"
+        vacc_status = str(vacc.status) if vacc.status else "due"  # type: ignore
+        status_info = vacc_status_map.get(
+            vacc_status, {"text": vacc_status, "color": "#6c757d", "icon": "💉"}
+        )
+        vaccs_rows += f"""
                 <tr>
                     <td><strong>#{vacc.id}</strong></td>
                     <td>💉 {safe(vacc.vaccine_name)}</td>
@@ -501,7 +517,7 @@ def db_details(limit: int = 10, db: Session = Depends(get_db)):
                 </tr>
                 """
 
-        html = f"""
+    html = f"""
         <!doctype html>
         <html lang="es">
         <head>
@@ -891,13 +907,13 @@ def db_details(limit: int = 10, db: Session = Depends(get_db)):
         </html>
         """
 
-        return HTMLResponse(content=html)
+    return HTMLResponse(content=html)
 
 
 @router.get("/admin/api_docs_friendly", response_class=HTMLResponse, tags=["admin"])
 def api_docs_friendly():
-        """Página amigable que explica la documentación de la API para usuarios no técnicos."""
-        html = """
+    """Página amigable que explica la documentación de la API para usuarios no técnicos."""
+    html = """
         <!doctype html>
         <html lang="es">
         <head>
@@ -1197,20 +1213,21 @@ def api_docs_friendly():
         </body>
         </html>
         """
-        
-        return HTMLResponse(content=html)
+
+    return HTMLResponse(content=html)
 
 
 @router.get("/admin/api_docs_visual", response_class=HTMLResponse, tags=["admin"])
 def api_docs_visual(db: Session = Depends(get_db)):
     """Documentación visual y amigable de todos los endpoints del sistema."""
-    
+
     # Obtener algunos datos de ejemplo para mostrar
     owners_count = db.query(models.Owner).count()
     pets_count = db.query(models.Pet).count()
     appointments_count = db.query(models.Appointment).count()
-    
-    html = """
+
+    html = (
+        """
     <!DOCTYPE html>
     <html lang="es">
     <head>
@@ -1512,15 +1529,21 @@ def api_docs_visual(db: Session = Depends(get_db)):
                 
                 <div class="stats">
                     <div class="stat-card">
-                        <div class="number">""" + str(owners_count) + """</div>
+                        <div class="number">"""
+        + str(owners_count)
+        + """</div>
                         <div class="label">👥 Dueños registrados</div>
                     </div>
                     <div class="stat-card">
-                        <div class="number">""" + str(pets_count) + """</div>
+                        <div class="number">"""
+        + str(pets_count)
+        + """</div>
                         <div class="label">🐾 Mascotas en sistema</div>
                     </div>
                     <div class="stat-card">
-                        <div class="number">""" + str(appointments_count) + """</div>
+                        <div class="number">"""
+        + str(appointments_count)
+        + """</div>
                         <div class="label">📅 Turnos totales</div>
                     </div>
                 </div>
@@ -1930,128 +1953,144 @@ def api_docs_visual(db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+    )
+
     return HTMLResponse(content=html)
 
 
 @router.get("/admin/presentation", response_class=HTMLResponse, tags=["admin"])
 def project_presentation():
     """Presentación completa del proyecto Veterinaria Inteligente - IFTS-12."""
-    
+
     # Leer el archivo markdown
-    presentation_path = Path(__file__).parent.parent.parent.parent / "docs" / "Presentacion_Proyecto.md"
-    
+    presentation_path = (
+        Path(__file__).parent.parent.parent.parent / "docs" / "Presentacion_Proyecto.md"
+    )
+
     try:
-        with open(presentation_path, 'r', encoding='utf-8') as f:
+        with open(presentation_path, "r", encoding="utf-8") as f:
             markdown_content = f.read()
     except FileNotFoundError:
-        markdown_content = "# Error\n\nNo se pudo encontrar el documento de presentación."
-    
+        markdown_content = (
+            "# Error\n\nNo se pudo encontrar el documento de presentación."
+        )
+
     # Convertir markdown a HTML (conversión básica)
-    html_content = markdown_content.replace('\n### ', '\n<h3>').replace('\n## ', '\n<h2>').replace('\n# ', '\n<h1>')
-    html_content = html_content.replace('### ', '<h3>').replace('## ', '<h2>').replace('# ', '<h1>')
-    html_content = html_content.replace('\n\n', '</p><p>').replace('\n', '<br>')
-    html_content = html_content.replace('**', '<strong>').replace('</strong>', '</strong>', 1)
-    
+    html_content = (
+        markdown_content.replace("\n### ", "\n<h3>")
+        .replace("\n## ", "\n<h2>")
+        .replace("\n# ", "\n<h1>")
+    )
+    html_content = (
+        html_content.replace("### ", "<h3>")
+        .replace("## ", "<h2>")
+        .replace("# ", "<h1>")
+    )
+    html_content = html_content.replace("\n\n", "</p><p>").replace("\n", "<br>")
+    html_content = html_content.replace("**", "<strong>").replace(
+        "</strong>", "</strong>", 1
+    )
+
     # Procesar listas
-    lines = markdown_content.split('\n')
+    lines = markdown_content.split("\n")
     processed_html = []
     in_list = False
     in_code_block = False
     in_table = False
-    
+
     for i, line in enumerate(lines):
         # Code blocks
-        if line.startswith('```'):
+        if line.startswith("```"):
             if not in_code_block:
-                processed_html.append('<pre><code>')
+                processed_html.append("<pre><code>")
                 in_code_block = True
             else:
-                processed_html.append('</code></pre>')
+                processed_html.append("</code></pre>")
                 in_code_block = False
             continue
-        
+
         if in_code_block:
             processed_html.append(line)
             continue
-        
+
         # Títulos
-        if line.startswith('# '):
-            processed_html.append(f'<h1>{line[2:]}</h1>')
-        elif line.startswith('## '):
-            processed_html.append(f'<h2>{line[3:]}</h2>')
-        elif line.startswith('### '):
-            processed_html.append(f'<h3>{line[4:]}</h3>')
-        elif line.startswith('#### '):
-            processed_html.append(f'<h4>{line[5:]}</h4>')
-        
+        if line.startswith("# "):
+            processed_html.append(f"<h1>{line[2:]}</h1>")
+        elif line.startswith("## "):
+            processed_html.append(f"<h2>{line[3:]}</h2>")
+        elif line.startswith("### "):
+            processed_html.append(f"<h3>{line[4:]}</h3>")
+        elif line.startswith("#### "):
+            processed_html.append(f"<h4>{line[5:]}</h4>")
+
         # Listas
-        elif line.startswith('- ') or line.startswith('* ') or line.startswith('+ '):
+        elif line.startswith("- ") or line.startswith("* ") or line.startswith("+ "):
             if not in_list:
-                processed_html.append('<ul>')
+                processed_html.append("<ul>")
                 in_list = True
             content = line[2:].strip()
             # Procesar bold
-            content = content.replace('**', '<strong>').replace('**', '</strong>')
-            content = content.replace('`', '<code>').replace('`', '</code>')
-            processed_html.append(f'<li>{content}</li>')
-        elif in_list and line.strip() == '':
-            processed_html.append('</ul>')
+            content = content.replace("**", "<strong>").replace("**", "</strong>")
+            content = content.replace("`", "<code>").replace("`", "</code>")
+            processed_html.append(f"<li>{content}</li>")
+        elif in_list and line.strip() == "":
+            processed_html.append("</ul>")
             in_list = False
-        
+
         # Tablas
-        elif '|' in line and not line.startswith('```'):
+        elif "|" in line and not line.startswith("```"):
             if not in_table:
-                processed_html.append('<table>')
+                processed_html.append("<table>")
                 in_table = True
-            cells = [cell.strip() for cell in line.split('|')[1:-1]]
-            if i > 0 and '---' in line:
+            cells = [cell.strip() for cell in line.split("|")[1:-1]]
+            if i > 0 and "---" in line:
                 continue
-            elif i > 0 and lines[i+1].strip().startswith('|---'):
-                processed_html.append('<thead><tr>')
+            elif i > 0 and lines[i + 1].strip().startswith("|---"):
+                processed_html.append("<thead><tr>")
                 for cell in cells:
-                    processed_html.append(f'<th>{cell}</th>')
-                processed_html.append('</tr></thead><tbody>')
+                    processed_html.append(f"<th>{cell}</th>")
+                processed_html.append("</tr></thead><tbody>")
             else:
-                processed_html.append('<tr>')
+                processed_html.append("<tr>")
                 for cell in cells:
-                    cell = cell.replace('**', '<strong>').replace('**', '</strong>')
-                    cell = cell.replace('`', '<code>').replace('`', '</code>')
-                    processed_html.append(f'<td>{cell}</td>')
-                processed_html.append('</tr>')
-        elif in_table and line.strip() == '':
-            processed_html.append('</tbody></table>')
+                    cell = cell.replace("**", "<strong>").replace("**", "</strong>")
+                    cell = cell.replace("`", "<code>").replace("`", "</code>")
+                    processed_html.append(f"<td>{cell}</td>")
+                processed_html.append("</tr>")
+        elif in_table and line.strip() == "":
+            processed_html.append("</tbody></table>")
             in_table = False
-        
+
         # Texto normal
-        elif line.strip() and not line.startswith('#'):
+        elif line.strip() and not line.startswith("#"):
             content = line.strip()
             # Procesar bold
             import re
-            content = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', content)
+
+            content = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", content)
             # Procesar código inline
-            content = re.sub(r'`(.*?)`', r'<code>\1</code>', content)
+            content = re.sub(r"`(.*?)`", r"<code>\1</code>", content)
             # Procesar enlaces
-            content = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2">\1</a>', content)
+            content = re.sub(r"\[(.*?)\]\((.*?)\)", r'<a href="\2">\1</a>', content)
             # Procesar emojis y símbolos
-            processed_html.append(f'<p>{content}</p>')
-        
-        elif line.strip() == '':
+            processed_html.append(f"<p>{content}</p>")
+
+        elif line.strip() == "":
             if in_list:
-                processed_html.append('</ul>')
+                processed_html.append("</ul>")
                 in_list = False
             if in_table:
-                processed_html.append('</tbody></table>')
+                processed_html.append("</tbody></table>")
                 in_table = False
-    
+
     # Cerrar listas/tablas abiertas
     if in_list:
-        processed_html.append('</ul>')
+        processed_html.append("</ul>")
     if in_table:
-        processed_html.append('</tbody></table>')
-    
-    final_html = '\n'.join(processed_html)
-    
+        processed_html.append("</tbody></table>")
+
+    final_html = "\n".join(processed_html)
+
     # Template HTML completo
     html = f"""
     <!DOCTYPE html>
@@ -2370,5 +2409,5 @@ def project_presentation():
     </body>
     </html>
     """
-    
+
     return HTMLResponse(content=html)

@@ -3,20 +3,25 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class AppointmentBase(BaseModel):
-    date: datetime = Field(..., example="2025-11-04T15:00:00")
-    reason: str = Field(..., example="control anual")
+    date: datetime = Field(
+        ...,
+        alias="appointment_date",
+        json_schema_extra={"example": "2025-11-04T15:00:00"},
+    )
+    reason: str = Field(..., json_schema_extra={"example": "control anual"})
 
 
 class AppointmentCreate(AppointmentBase):
-    pet_id: int = Field(..., example=1)
+    pet_id: int = Field(..., json_schema_extra={"example": 1})
     model_config = ConfigDict(
+        populate_by_name=True,
         json_schema_extra={
             "example": {
                 "date": "2025-11-04T15:00:00",
                 "reason": "control anual",
                 "pet_id": 1,
             }
-        }
+        },
     )
 
 
@@ -28,6 +33,7 @@ class AppointmentRead(AppointmentBase):
     updated_at: datetime | None = None
     model_config = ConfigDict(
         from_attributes=True,
+        populate_by_name=True,
         json_schema_extra={
             "example": {
                 "id": 1,

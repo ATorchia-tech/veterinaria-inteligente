@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime, date as date_type, timedelta
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Form, Query
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
@@ -17,7 +17,7 @@ def create_appointment(payload: AppointmentCreate, db: Session = Depends(get_db)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
     ap = models.Appointment(
-        date=payload.date,
+        appointment_date=payload.date,
         reason=payload.reason,
         status="scheduled",
         pet_id=payload.pet_id,
@@ -40,7 +40,7 @@ def create_appointment_form(
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
     ap = models.Appointment(
-        date=date,
+        appointment_date=date,
         reason=reason,
         status="scheduled",
         pet_id=pet_id,
@@ -48,29 +48,37 @@ def create_appointment_form(
     db.add(ap)
     db.commit()
     db.refresh(ap)
-    
+
     # Obtener información relacionada
     owner = pet.owner
-    
+
     # Formatear fecha y hora
-    fecha_turno = ap.date.strftime('%d/%m/%Y')
-    hora_turno = ap.date.strftime('%H:%M')
-    dia_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][ap.date.weekday()]
-    
+    fecha_turno = ap.appointment_date.strftime("%d/%m/%Y")
+    hora_turno = ap.appointment_date.strftime("%H:%M")
+    dia_semana = [
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+        "Domingo",
+    ][ap.appointment_date.weekday()]
+
     # Estado del turno en español
     status_text = {
-        'scheduled': 'Programado',
-        'attended': 'Atendido',
-        'canceled': 'Cancelado'
+        "scheduled": "Programado",
+        "attended": "Atendido",
+        "canceled": "Cancelado",
     }.get(ap.status, ap.status)
-    
+
     # Color según estado
     status_color = {
-        'scheduled': '#28a745',
-        'attended': '#007bff',
-        'canceled': '#dc3545'
-    }.get(ap.status, '#6c757d')
-    
+        "scheduled": "#28a745",
+        "attended": "#007bff",
+        "canceled": "#dc3545",
+    }.get(ap.status, "#6c757d")
+
     # Generar HTML de confirmación
     html_content = f"""
     <!doctype html>
@@ -452,13 +460,17 @@ def create_appointment_form(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
 @router.get("/", response_model=List[AppointmentRead])
 def list_appointments(db: Session = Depends(get_db)):
-    return db.query(models.Appointment).order_by(models.Appointment.appointment_date.asc()).all()
+    return (
+        db.query(models.Appointment)
+        .order_by(models.Appointment.appointment_date.asc())
+        .all()
+    )
 
 
 # NOTA: Esta ruta /view está deshabilitada porque hay una definición duplicada más completa
@@ -471,31 +483,41 @@ def list_appointments_view(
     db: Session = Depends(get_db),
 ):
     """Vista HTML amigable de todos los turnos con paginación."""
-    q = db.query(models.Appointment).order_by(models.Appointment.appointment_date.desc())
+    q = db.query(models.Appointment).order_by(
+        models.Appointment.appointment_date.desc()
+    )
     total_count = q.count()
     appointments = q.offset((page - 1) * page_size).limit(page_size).all()
-    
+
     total_pages = (total_count + page_size - 1) // page_size
-    
+
     # Generar filas de la tabla
     appointment_rows = ""
     for apt in appointments:
         # Formatear fecha y hora
-        fecha_display = apt.appointment_date.strftime('%d/%m/%Y')
-        hora_display = apt.appointment_date.strftime('%H:%M')
-        dia_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][apt.appointment_date.weekday()]
-        
+        fecha_display = apt.appointment_date.strftime("%d/%m/%Y")
+        hora_display = apt.appointment_date.strftime("%H:%M")
+        dia_semana = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][
+            apt.appointment_date.weekday()
+        ]
+
         # Estado y colores
         status_config = {
-            'scheduled': {'text': 'Programado', 'color': '#28a745', 'icon': '📅'},
-            'attended': {'text': 'Atendido', 'color': '#007bff', 'icon': '✅'},
-            'canceled': {'text': 'Cancelado', 'color': '#dc3545', 'icon': '❌'}
+            "scheduled": {"text": "Programado", "color": "#28a745", "icon": "📅"},
+            "attended": {"text": "Atendido", "color": "#007bff", "icon": "✅"},
+            "canceled": {"text": "Cancelado", "color": "#dc3545", "icon": "❌"},
         }
-        status_info = status_config.get(apt.status, {'text': apt.status, 'color': '#6c757d', 'icon': '❓'})
-        
+        status_info = status_config.get(
+            apt.status, {"text": apt.status, "color": "#6c757d", "icon": "❓"}
+        )
+
         pet_name = apt.pet.name if apt.pet else '<span style="color: #999;">-</span>'
-        owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else '<span style="color: #999;">-</span>'
-        
+        owner_name = (
+            apt.pet.owner.name
+            if apt.pet and apt.pet.owner
+            else '<span style="color: #999;">-</span>'
+        )
+
         appointment_rows += f"""
         <tr>
             <td style="text-align: center; font-weight: 600;">#{apt.id}</td>
@@ -519,15 +541,15 @@ def list_appointments_view(
             </td>
         </tr>
         """
-    
+
     # Controles de paginación
     pagination = ""
     if total_pages > 1:
-        prev_disabled = 'disabled' if page <= 1 else ''
-        next_disabled = 'disabled' if page >= total_pages else ''
+        prev_disabled = "disabled" if page <= 1 else ""
+        next_disabled = "disabled" if page >= total_pages else ""
         prev_page = max(1, page - 1)
         next_page = min(total_pages, page + 1)
-        
+
         pagination = f"""
         <div class="pagination">
             <a href="/appointments/view?page={prev_page}&page_size={page_size}" class="btn-page" {prev_disabled}>← Anterior</a>
@@ -537,7 +559,7 @@ def list_appointments_view(
         """
     else:
         pagination = f'<div class="pagination"><span class="page-info">Total: {total_count} turnos</span></div>'
-    
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -782,7 +804,7 @@ def list_appointments_view(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -791,62 +813,65 @@ def search_appointments(
     from_date: Optional[str] = Query(None, alias="from"),
     to_date: Optional[str] = Query(None, alias="to"),
     status: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Vista HTML de búsqueda avanzada de turnos con filtros."""
     # Parsear fechas
     start_date = None
     end_date = None
-    
+
     if from_date:
         try:
             start_date = datetime.strptime(from_date, "%Y-%m-%d").date()
         except ValueError:
             pass
-    
+
     if to_date:
         try:
             end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
         except ValueError:
             pass
-    
+
     # Construir query
     query = db.query(models.Appointment)
-    
+
     # Filtrar por rango de fechas
     if start_date:
         start_datetime = datetime.combine(start_date, datetime.min.time())
         query = query.filter(models.Appointment.appointment_date >= start_datetime)
-    
+
     if end_date:
         end_datetime = datetime.combine(end_date, datetime.max.time())
         query = query.filter(models.Appointment.appointment_date <= end_datetime)
-    
+
     # Filtrar por estado
     if status:
         query = query.filter(models.Appointment.status == status)
-    
+
     appointments = query.order_by(models.Appointment.appointment_date.asc()).all()
-    
+
     # Configuración de vista según filtros
     status_config = {
-        'attended': {'name': 'Atendidos', 'color': '#28a745'},
-        'scheduled': {'name': 'Programados', 'color': '#667eea'},
-        'canceled': {'name': 'Cancelados', 'color': '#dc3545'}
+        "attended": {"name": "Atendidos", "color": "#28a745"},
+        "scheduled": {"name": "Programados", "color": "#667eea"},
+        "canceled": {"name": "Cancelados", "color": "#dc3545"},
     }
-    
-    status_info = status_config.get(status or 'all', {'name': 'Todos', 'color': '#667eea'})
-    
+
+    status_info = status_config.get(
+        status or "all", {"name": "Todos", "color": "#667eea"}
+    )
+
     # Agrupar por fecha para mejor visualización
     from collections import defaultdict
+
     appointments_by_date = defaultdict(list)
     for apt in appointments:
         date_key = apt.appointment_date.date()
         appointments_by_date[date_key].append(apt)
-    
+
     # Ordenar fechas
     sorted_dates = sorted(appointments_by_date.keys())
-    
+
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -1151,16 +1176,21 @@ def search_appointments(
           </div>
         </div>
     """
-    
+
     if appointments:
         for date_key in sorted_dates:
             date_appointments = appointments_by_date[date_key]
-            weekday = date_key.strftime('%A')
+            weekday = date_key.strftime("%A")
             weekday_es = {
-                'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles',
-                'Thursday': 'Jueves', 'Friday': 'Viernes', 'Saturday': 'Sábado', 'Sunday': 'Domingo'
+                "Monday": "Lunes",
+                "Tuesday": "Martes",
+                "Wednesday": "Miércoles",
+                "Thursday": "Jueves",
+                "Friday": "Viernes",
+                "Saturday": "Sábado",
+                "Sunday": "Domingo",
             }.get(weekday, weekday)
-            
+
             html_content += f"""
         <div class="date-group">
           <div class="date-header">
@@ -1169,22 +1199,24 @@ def search_appointments(
           </div>
           <div class="appointments-grid">
             """
-            
+
             for apt in date_appointments:
                 apt_status = str(apt.status)
                 status_text = {
-                    'scheduled': 'Programado',
-                    'attended': 'Atendido',
-                    'canceled': 'Cancelado'
+                    "scheduled": "Programado",
+                    "attended": "Atendido",
+                    "canceled": "Cancelado",
                 }.get(apt_status, apt_status)
-                
-                time_str = apt.appointment_date.strftime('%H:%M')
-                pet_name = apt.pet.name if apt.pet else 'N/A'
-                owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else 'N/A'
-                owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else 'N/A'
-                pet_species = apt.pet.species if apt.pet else 'N/A'
-                pet_breed = apt.pet.breed if apt.pet else 'N/A'
-                
+
+                time_str = apt.appointment_date.strftime("%H:%M")
+                pet_name = apt.pet.name if apt.pet else "N/A"
+                owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else "N/A"
+                owner_phone = (
+                    apt.pet.owner.phone if apt.pet and apt.pet.owner else "N/A"
+                )
+                pet_species = apt.pet.species if apt.pet else "N/A"
+                pet_breed = apt.pet.breed if apt.pet else "N/A"
+
                 html_content += f"""
             <div class="appointment-card {apt_status}">
               <div class="appointment-header">
@@ -1219,7 +1251,7 @@ def search_appointments(
               </div>
             </div>
                 """
-            
+
             html_content += """
           </div>
         </div>
@@ -1232,7 +1264,7 @@ def search_appointments(
           <p style="font-size: 1rem; color: #999;">Intenta ajustar los criterios de búsqueda.</p>
         </div>
         """
-    
+
     html_content += """
         <div style="text-align: center;">
           <a href="/vet/gestion" class="back-link">⬅️ Volver a Gestión Veterinaria</a>
@@ -1241,7 +1273,7 @@ def search_appointments(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1250,7 +1282,7 @@ def view_appointments(
     pet_id: Optional[int] = Query(None),
     status: Optional[str] = Query(None),
     date: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Vista HTML de turnos filtrados por mascota, estado y/o fecha."""
     # Obtener información de la mascota si se proporciona pet_id
@@ -1259,7 +1291,7 @@ def view_appointments(
         pet = db.get(models.Pet, pet_id)
         if not pet:
             raise HTTPException(status_code=404, detail="Mascota no encontrada")
-    
+
     # Parsear fecha
     target_date = None
     if date:
@@ -1267,79 +1299,84 @@ def view_appointments(
             target_date = datetime.strptime(date, "%Y-%m-%d").date()
         except ValueError:
             pass
-    
+
     # Construir query
     query = db.query(models.Appointment)
-    
+
     # Filtrar por mascota si se proporciona
     if pet_id:
         query = query.filter(models.Appointment.pet_id == pet_id)
-    
+
     # Filtrar por fecha si se proporciona
     if target_date:
         start = datetime.combine(target_date, datetime.min.time())
         end = start + timedelta(days=1)
         query = query.filter(
             models.Appointment.appointment_date >= start,
-            models.Appointment.appointment_date < end
+            models.Appointment.appointment_date < end,
         )
-    
+
     # Filtrar por estado si se proporciona
     if status:
         query = query.filter(models.Appointment.status == status)
-    
+
     appointments = query.order_by(models.Appointment.appointment_date.asc()).all()
-    
+
     # Definir títulos y colores según el contexto
     if pet:
         # Emoji de especie
         species_lower = pet.species.lower()
-        if 'perro' in species_lower or 'dog' in species_lower:
-            species_emoji = '🐕'
-        elif 'gato' in species_lower or 'cat' in species_lower:
-            species_emoji = '🐈'
+        if "perro" in species_lower or "dog" in species_lower:
+            species_emoji = "🐕"
+        elif "gato" in species_lower or "cat" in species_lower:
+            species_emoji = "🐈"
         else:
-            species_emoji = '🐾'
-        
-        title = f'📅 Turnos de {pet.name}'
+            species_emoji = "🐾"
+
+        title = f"📅 Turnos de {pet.name}"
         subtitle = f'{species_emoji} {pet.species} | Dueño: {pet.owner.name if pet.owner else "N/A"}'
-        color = '#667eea'
-        gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        color = "#667eea"
+        gradient = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     else:
         # Definir títulos y colores según el estado
         status_config = {
-            'attended': {
-                'title': '✅ Turnos Atendidos',
-                'color': '#28a745',
-                'gradient': 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-                'text': 'Atendido'
+            "attended": {
+                "title": "✅ Turnos Atendidos",
+                "color": "#28a745",
+                "gradient": "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
+                "text": "Atendido",
             },
-            'scheduled': {
-                'title': '⏳ Turnos Programados',
-                'color': '#667eea',
-                'gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                'text': 'Programado'
+            "scheduled": {
+                "title": "⏳ Turnos Programados",
+                "color": "#667eea",
+                "gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                "text": "Programado",
             },
-            'canceled': {
-                'title': '❌ Turnos Cancelados',
-                'color': '#dc3545',
-                'gradient': 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
-                'text': 'Cancelado'
-            }
+            "canceled": {
+                "title": "❌ Turnos Cancelados",
+                "color": "#dc3545",
+                "gradient": "linear-gradient(135deg, #dc3545 0%, #c82333 100%)",
+                "text": "Cancelado",
+            },
         }
-        
-        config = status_config.get(status or 'all', {
-            'title': '📋 Todos los Turnos',
-            'color': '#667eea',
-            'gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            'text': 'Turno'
-        })
-        
-        title = config['title']
-        subtitle = target_date.strftime('%d/%m/%Y') if target_date else 'Todas las fechas'
-        color = config['color']
-        gradient = config['gradient']
-    
+
+        config = status_config.get(
+            status or "all",
+            {
+                "title": "📋 Todos los Turnos",
+                "color": "#667eea",
+                "gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                "text": "Turno",
+            },
+        )
+
+        title = config["title"]
+        subtitle = (
+            target_date.strftime("%d/%m/%Y") if target_date else "Todas las fechas"
+        )
+        color = config["color"]
+        gradient = config["gradient"]
+
     # Generar HTML
     html_content = f"""
     <!doctype html>
@@ -1530,25 +1567,25 @@ def view_appointments(
         
         <div class="appointments-grid">
     """
-    
+
     if appointments:
         for apt in appointments:
-            time_str = apt.appointment_date.strftime('%H:%M')
-            date_full = apt.appointment_date.strftime('%d/%m/%Y')
-            pet_name = apt.pet.name if apt.pet else 'N/A'
-            owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else 'N/A'
-            owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else 'N/A'
-            pet_species = apt.pet.species if apt.pet else 'N/A'
-            pet_breed = apt.pet.breed if apt.pet else 'N/A'
-            
+            time_str = apt.appointment_date.strftime("%H:%M")
+            date_full = apt.appointment_date.strftime("%d/%m/%Y")
+            pet_name = apt.pet.name if apt.pet else "N/A"
+            owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else "N/A"
+            owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else "N/A"
+            pet_species = apt.pet.species if apt.pet else "N/A"
+            pet_breed = apt.pet.breed if apt.pet else "N/A"
+
             # Calcular estado del turno
             today = datetime.now().date()
             apt_date = apt.appointment_date.date()
-            
-            if apt.status == 'attended':
+
+            if apt.status == "attended":
                 status_class = "attended"
                 status_text = "✓ Atendido"
-            elif apt.status == 'canceled':
+            elif apt.status == "canceled":
                 status_class = "canceled"
                 status_text = "✗ Cancelado"
             elif apt_date >= today:
@@ -1557,7 +1594,7 @@ def view_appointments(
             else:
                 status_class = "scheduled"
                 status_text = "◷ Pendiente"
-            
+
             html_content += f"""
           <div class="appointment-card">
             <div class="appointment-header">
@@ -1602,7 +1639,7 @@ def view_appointments(
             <p>No se encontraron turnos con los filtros seleccionados.</p>
           </div>
         """
-    
+
     html_content += """
         </div>
         
@@ -1613,7 +1650,7 @@ def view_appointments(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1623,53 +1660,67 @@ def view_appointment_detail(appointment_id: int, db: Session = Depends(get_db)):
     apt = db.get(models.Appointment, appointment_id)
     if not apt:
         raise HTTPException(status_code=404, detail="Appointment not found")
-    
+
     # Formatear fecha y hora
-    fecha_turno = apt.appointment_date.strftime('%d/%m/%Y')
-    hora_turno = apt.appointment_date.strftime('%H:%M')
-    dia_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][apt.appointment_date.weekday()]
-    
+    fecha_turno = apt.appointment_date.strftime("%d/%m/%Y")
+    hora_turno = apt.appointment_date.strftime("%H:%M")
+    dia_semana = [
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+        "Domingo",
+    ][apt.appointment_date.weekday()]
+
     # Estado del turno en español
     status_text = {
-        'scheduled': 'Programado',
-        'attended': 'Atendido',
-        'canceled': 'Cancelado'
-    }.get(apt.status, apt.status)  # type: ignore
-    
+        "scheduled": "Programado",
+        "attended": "Atendido",
+        "canceled": "Cancelado",
+    }.get(
+        apt.status, apt.status
+    )  # type: ignore
+
     # Color según estado
     status_color = {
-        'scheduled': '#28a745',
-        'attended': '#007bff',
-        'canceled': '#dc3545'
-    }.get(apt.status, '#6c757d')  # type: ignore
-    
+        "scheduled": "#28a745",
+        "attended": "#007bff",
+        "canceled": "#dc3545",
+    }.get(
+        apt.status, "#6c757d"
+    )  # type: ignore
+
     # Emoji según estado
-    status_emoji = {
-        'scheduled': '📅',
-        'attended': '✅',
-        'canceled': '❌'
-    }.get(apt.status, '📋')  # type: ignore
-    
+    status_emoji = {"scheduled": "📅", "attended": "✅", "canceled": "❌"}.get(
+        apt.status, "📋"
+    )  # type: ignore
+
     # Información de la mascota y dueño
-    pet_name = apt.pet.name if apt.pet else 'N/A'
-    pet_species = apt.pet.species if apt.pet else 'N/A'
-    pet_breed = apt.pet.breed if apt.pet and apt.pet.breed else 'N/A'
-    owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else 'N/A'
-    owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else 'N/A'
-    
+    pet_name = apt.pet.name if apt.pet else "N/A"
+    pet_species = apt.pet.species if apt.pet else "N/A"
+    pet_breed = apt.pet.breed if apt.pet and apt.pet.breed else "N/A"
+    owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else "N/A"
+    owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else "N/A"
+
     # Emoji según especie
     species_emoji = {
-        'perro': '🐕',
-        'gato': '🐈',
-        'ave': '🦜',
-        'conejo': '🐰',
-        'hamster': '🐹',
-        'otro': '🐾'
-    }.get(pet_species.lower() if pet_species != 'N/A' else 'otro', '🐾')
-    
+        "perro": "🐕",
+        "gato": "🐈",
+        "ave": "🦜",
+        "conejo": "🐰",
+        "hamster": "🐹",
+        "otro": "🐾",
+    }.get(pet_species.lower() if pet_species != "N/A" else "otro", "🐾")
+
     # Notas (incluye info de cancelación si aplica)
-    notes_html = f"<p>{apt.notes}</p>" if apt.notes else "<p style='color: #888;'><em>Sin notas adicionales</em></p>"
-    
+    notes_html = (
+        f"<p>{apt.notes}</p>"
+        if apt.notes
+        else "<p style='color: #888;'><em>Sin notas adicionales</em></p>"
+    )
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -1900,13 +1951,13 @@ def view_appointment_detail(appointment_id: int, db: Session = Depends(get_db)):
           <div class="buttons">
             <a href="/appointments/view" class="btn btn-secondary">⬅️ Volver al Listado</a>
     """
-    
+
     # Agregar botón de cancelar solo si el turno está programado
-    if apt.status == 'scheduled':  # type: ignore
+    if apt.status == "scheduled":  # type: ignore
         html_content += f"""
             <a href="/appointments/{apt.id}/cancel-form" class="btn btn-danger">❌ Cancelar Turno</a>
         """
-    
+
     html_content += """
           </div>
         </div>
@@ -1914,7 +1965,7 @@ def view_appointment_detail(appointment_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -1923,7 +1974,7 @@ def cancel_appointment(appointment_id: int, db: Session = Depends(get_db)):
     ap = db.get(models.Appointment, appointment_id)
     if not ap:
         raise HTTPException(status_code=404, detail="Appointment not found")
-    setattr(ap, 'status', 'canceled')  # type: ignore
+    setattr(ap, "status", "canceled")  # type: ignore
     db.commit()
     db.refresh(ap)
     return ap
@@ -1935,18 +1986,26 @@ def cancel_appointment_form(appointment_id: int, db: Session = Depends(get_db)):
     apt = db.get(models.Appointment, appointment_id)
     if not apt:
         raise HTTPException(status_code=404, detail="Appointment not found")
-    
-    if apt.status == 'canceled':  # type: ignore
+
+    if apt.status == "canceled":  # type: ignore
         raise HTTPException(status_code=400, detail="Este turno ya está cancelado")
-    
+
     # Formatear fecha y hora
-    fecha_turno = apt.appointment_date.strftime('%d/%m/%Y')
-    hora_turno = apt.appointment_date.strftime('%H:%M')
-    dia_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][apt.appointment_date.weekday()]
-    
-    pet_name = apt.pet.name if apt.pet else 'N/A'
-    owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else 'N/A'
-    
+    fecha_turno = apt.appointment_date.strftime("%d/%m/%Y")
+    hora_turno = apt.appointment_date.strftime("%H:%M")
+    dia_semana = [
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+        "Domingo",
+    ][apt.appointment_date.weekday()]
+
+    pet_name = apt.pet.name if apt.pet else "N/A"
+    owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else "N/A"
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -2152,7 +2211,7 @@ def cancel_appointment_form(appointment_id: int, db: Session = Depends(get_db)):
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -2167,47 +2226,47 @@ def cancel_appointment_confirm(
     apt = db.get(models.Appointment, appointment_id)
     if not apt:
         raise HTTPException(status_code=404, detail="Appointment not found")
-    
-    if apt.status == 'canceled':  # type: ignore
+
+    if apt.status == "canceled":  # type: ignore
         raise HTTPException(status_code=400, detail="Este turno ya está cancelado")
-    
+
     # Formatear fecha y hora
-    fecha_turno = apt.appointment_date.strftime('%d/%m/%Y')
-    hora_turno = apt.appointment_date.strftime('%H:%M')
-    
-    pet_name = apt.pet.name if apt.pet else 'N/A'
-    owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else 'N/A'
-    owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else 'N/A'
-    
+    fecha_turno = apt.appointment_date.strftime("%d/%m/%Y")
+    hora_turno = apt.appointment_date.strftime("%H:%M")
+
+    pet_name = apt.pet.name if apt.pet else "N/A"
+    owner_name = apt.pet.owner.name if apt.pet and apt.pet.owner else "N/A"
+    owner_phone = apt.pet.owner.phone if apt.pet and apt.pet.owner else "N/A"
+
     # Mapear motivos a texto legible
     reason_map = {
-        'paciente_no_asistio': 'Paciente no asistió (No-show)',
-        'solicitud_dueno': 'Solicitud del dueño',
-        'emergencia_dueno': 'Emergencia del dueño',
-        'mascota_mejor': 'Mascota mejoró',
-        'clima': 'Problemas climáticos',
-        'transporte': 'Problemas de transporte',
-        'reprogramado': 'Turno reprogramado',
-        'otro': 'Otro motivo'
+        "paciente_no_asistio": "Paciente no asistió (No-show)",
+        "solicitud_dueno": "Solicitud del dueño",
+        "emergencia_dueno": "Emergencia del dueño",
+        "mascota_mejor": "Mascota mejoró",
+        "clima": "Problemas climáticos",
+        "transporte": "Problemas de transporte",
+        "reprogramado": "Turno reprogramado",
+        "otro": "Otro motivo",
     }
     reason_text = reason_map.get(cancellation_reason, cancellation_reason)
-    
+
     # Actualizar estado y agregar nota de cancelación
-    apt.status = 'canceled'  # type: ignore
-    
+    apt.status = "canceled"  # type: ignore
+
     # Agregar motivo de cancelación a las notas
     cancel_record = f"[CANCELADO] {reason_text}"
     if cancellation_notes:
         cancel_record += f": {cancellation_notes}"
-    
+
     if apt.notes:  # type: ignore
         apt.notes = f"{apt.notes}\n\n{cancel_record}"  # type: ignore
     else:
         apt.notes = cancel_record  # type: ignore
-    
+
     db.commit()
     db.refresh(apt)
-    
+
     # Página de confirmación
     html_content = f"""
     <!doctype html>
@@ -2394,5 +2453,5 @@ def cancel_appointment_confirm(
     </body>
     </html>
     """
-    
+
     return html_content

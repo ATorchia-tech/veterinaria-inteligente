@@ -10,6 +10,11 @@ def test_schemas_imports():
     PetCreate(name="Firulais", species="perro", owner_id=1)
     AppointmentCreate(date="2025-11-04T15:00:00", reason="control anual", pet_id=1)
     ClinicalRecordCreate(pet_id=1)
-    VaccinationCreate(vaccine_name="Antirrábica", due_date="2025-12-01", pet_id=1)
+    VaccinationCreate(
+        vaccine_name="Antirrábica",
+        due_date="2025-12-01",
+        applied_date="2024-12-01",
+        pet_id=1,
+    )
 
     assert True

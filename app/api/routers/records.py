@@ -51,10 +51,14 @@ def create_record_form(
     db.add(rec)
     db.commit()
     db.refresh(rec)
-    
+
     # Generar HTML de confirmación
-    species_emoji = "🐕" if pet.species.lower() == "perro" else "🐈" if pet.species.lower() == "gato" else "🐾"
-    
+    species_emoji = (
+        "🐕"
+        if pet.species.lower() == "perro"
+        else "🐈" if pet.species.lower() == "gato" else "🐾"
+    )
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -318,7 +322,7 @@ def create_record_form(
     </body>
     </html>
     """
-    
+
     return html_content
 
 
@@ -346,7 +350,7 @@ def view_records(
     pet = db.get(models.Pet, pet_id)
     if not pet:
         raise HTTPException(status_code=404, detail="Mascota no encontrada")
-    
+
     # Obtener récords clínicos
     records = (
         db.query(models.ClinicalRecord)
@@ -354,16 +358,16 @@ def view_records(
         .order_by(models.ClinicalRecord.visit_date.desc())
         .all()
     )
-    
+
     # Emoji de especie
     species_lower = pet.species.lower()
-    if 'perro' in species_lower or 'dog' in species_lower:
-        species_emoji = '🐕'
-    elif 'gato' in species_lower or 'cat' in species_lower:
-        species_emoji = '🐈'
+    if "perro" in species_lower or "dog" in species_lower:
+        species_emoji = "🐕"
+    elif "gato" in species_lower or "cat" in species_lower:
+        species_emoji = "🐈"
     else:
-        species_emoji = '🐾'
-    
+        species_emoji = "🐾"
+
     html_content = f"""
     <!doctype html>
     <html lang="es">
@@ -586,14 +590,30 @@ def view_records(
           
           <div class="records-list">
     """
-    
+
     if records:
         for record in records:
-            symptoms_html = f'<div class="record-value">{record.symptoms}</div>' if record.symptoms else '<div class="record-value empty">Sin síntomas registrados</div>'
-            diagnosis_html = f'<div class="record-value">{record.diagnosis}</div>' if record.diagnosis else '<div class="record-value empty">Sin diagnóstico</div>'
-            treatment_html = f'<div class="record-value">{record.treatment}</div>' if record.treatment else '<div class="record-value empty">Sin tratamiento especificado</div>'
-            medications_html = f'<div class="record-value">{record.medications}</div>' if record.medications else '<div class="record-value empty">Sin medicamentos recetados</div>'
-            
+            symptoms_html = (
+                f'<div class="record-value">{record.symptoms}</div>'
+                if record.symptoms
+                else '<div class="record-value empty">Sin síntomas registrados</div>'
+            )
+            diagnosis_html = (
+                f'<div class="record-value">{record.diagnosis}</div>'
+                if record.diagnosis
+                else '<div class="record-value empty">Sin diagnóstico</div>'
+            )
+            treatment_html = (
+                f'<div class="record-value">{record.treatment}</div>'
+                if record.treatment
+                else '<div class="record-value empty">Sin tratamiento especificado</div>'
+            )
+            medications_html = (
+                f'<div class="record-value">{record.medications}</div>'
+                if record.medications
+                else '<div class="record-value empty">Sin medicamentos recetados</div>'
+            )
+
             html_content += f"""
             <div class="record-card">
               <div class="record-header">
@@ -630,7 +650,7 @@ def view_records(
               <p style="margin: 0; font-size: 1.1rem;">Esta mascota no tiene consultas médicas registradas.</p>
             </div>
         """
-    
+
     html_content += f"""
           </div>
           
@@ -648,5 +668,5 @@ def view_records(
     </body>
     </html>
     """
-    
+
     return html_content

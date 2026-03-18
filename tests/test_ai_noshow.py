@@ -7,8 +7,18 @@ client = TestClient(app)
 
 
 def setup_module():
-    # train model to avoid fallback randomness in tests
-    train_noshow_model()
+    # train model only if it doesn't exist (avoid network calls during tests)
+    from pathlib import Path
+
+    model_path = (
+        Path(__file__).resolve().parent.parent
+        / "app"
+        / "ml"
+        / "models"
+        / "noshow.joblib"
+    )
+    if not model_path.exists():
+        train_noshow_model()
 
 
 def test_noshow_endpoint():

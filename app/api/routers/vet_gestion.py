@@ -9,8 +9,9 @@ router = APIRouter()
 def vet_gestion_home():
     """Panel de Gestión Veterinaria - Control completo de la veterinaria"""
     today = date.today().isoformat()
-    
-    return HTMLResponse(content=f"""
+
+    return HTMLResponse(
+        content=f"""
 <!doctype html>
 <html lang="es">
 <head>
@@ -473,4 +474,5 @@ def vet_gestion_home():
   </script>
 </body>
 </html>
-""")
+"""
+    )

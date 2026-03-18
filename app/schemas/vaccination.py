@@ -3,14 +3,14 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class VaccinationBase(BaseModel):
-    vaccine_name: str = Field(..., example="Antirrábica")
-    due_date: date = Field(..., example="2025-12-01")
-    applied_date: date = Field(..., example="2024-12-01")
-    notes: str | None = Field(None, example="Primera dosis")
+    vaccine_name: str = Field(..., json_schema_extra={"example": "Antirrábica"})
+    due_date: date = Field(..., json_schema_extra={"example": "2025-12-01"})
+    applied_date: date = Field(..., json_schema_extra={"example": "2024-12-01"})
+    notes: str | None = Field(None, json_schema_extra={"example": "Primera dosis"})
 
 
 class VaccinationCreate(VaccinationBase):
-    pet_id: int = Field(..., example=1)
+    pet_id: int = Field(..., json_schema_extra={"example": 1})
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
